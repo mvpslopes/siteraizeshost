@@ -1,0 +1,10 @@
+// Arquivo de configuração para produção
+// Copie este arquivo para config.js e preencha com suas credenciais reais
+// NUNCA commite o arquivo config.js com credenciais reais no Git!
+
+window.APP_CONFIG = {
+  VITE_SUPABASE_URL: 'https://seu-projeto.supabase.co',
+  VITE_SUPABASE_ANON_KEY: 'sua-chave-anonima-aqui'
+};
+
+
