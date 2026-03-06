@@ -43,6 +43,8 @@ export interface Event {
   image_url: string;
   observations: string;
   status: EventStatus;
+  /** Cenário usado como plano do evento (Gestão de Eventos / pagamentos). */
+  chosen_scenario_id?: string | null;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -96,9 +98,26 @@ export interface ContactMessage {
   created_at: string;
 }
 
-export type FinancialCategory = 'infraestrutura' | 'marketing' | 'pessoal' | 'alimentacao' | 'transporte' | 'equipamentos' | 'ingressos' | 'patrocinios' | 'vendas' | 'parcerias' | 'governo' | 'outros';
+export type FinancialCategory =
+  | 'infraestrutura'
+  | 'marketing'
+  | 'pessoal'
+  | 'alimentacao'
+  | 'transporte'
+  | 'equipamentos'
+  | 'ingressos'
+  | 'patrocinios'
+  | 'vendas'
+  | 'parcerias'
+  | 'governo'
+  | 'outros';
+
 export type FinancialType = 'custo' | 'receita';
-export type PaymentStatus = 'pendente' | 'pago' | 'atrasado' | 'cancelado';
+
+// Inclui "previsto" para planejamento financeiro de cenários
+export type PaymentStatus = 'previsto' | 'pendente' | 'pago' | 'atrasado' | 'cancelado';
+
+export type FinancialNature = 'fixa' | 'variavel';
 
 export interface FinancialTransaction {
   id: string;
@@ -115,6 +134,33 @@ export interface FinancialTransaction {
   created_by: string;
   created_at: string;
   updated_at: string;
+}
+
+// Planejamento financeiro por evento (itens e cenários)
+
+export interface EventFinancialItem {
+  id: string;
+  event_id: string;
+  type: FinancialType;           // custo ou receita
+  nature: FinancialNature;       // fixa ou variavel
+  name: string;                  // ex.: Buffet, Inscrição embriões
+  description: string;           // descrição detalhada
+  category?: string;             // categoria livre (Buffet, Empresa Leiloeira, etc.)
+  base_amount?: number;          // valor fixo em R$ (para natureza = fixa)
+  percentage_over_revenue?: number; // percentual do faturamento (0.05 = 5%), para variavel
+  payment_status: PaymentStatus; // previsto/pendente/pago/atrasado/cancelado
+  due_date?: string;
+  payment_date?: string;
+  partner?: string;              // fornecedor/cliente (Grupo Raça, Empresa Leiloeira, etc.)
+  notes?: string;
+}
+
+export interface EventScenario {
+  id: string;
+  event_id: string;
+  code: string;              // A, B, C...
+  name: string;              // Cenário A, Cenário B...
+  expected_revenue: number;  // faturamento previsto do cenário
 }
 
 export interface FinancialReport {

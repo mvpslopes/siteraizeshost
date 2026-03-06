@@ -70,6 +70,21 @@
   animation-delay: 0.6s;
 }
 
+/* Ritmo da landing: espaçamento e títulos de seção */
+:root {
+  --section-padding-y: 5rem;   /* 80px */
+  --section-padding-y-md: 6rem; /* 96px */
+  --section-inner-gap: 4rem;   /* 64px - entre bloco de título e conteúdo */
+  --container-px: 1rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --section-padding-y: 6rem;
+    --section-padding-y-md: 7rem;
+  }
+}
+
 /* Estilos globais melhorados */
 @layer base {
   html {
@@ -79,6 +94,20 @@
   body {
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+/* Padrão de título de seção para harmonia */
+.section-label {
+  @apply text-xs font-semibold uppercase tracking-widest text-primary-600 mb-3 block;
+}
+.section-title {
+  @apply text-4xl md:text-5xl font-bold tracking-tight text-gray-800 mb-4;
+}
+.section-title-accent {
+  @apply text-primary-600;
+}
+.section-lead {
+  @apply text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto;
 }
 
 @layer components {

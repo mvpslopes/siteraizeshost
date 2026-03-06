@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { GalleryMedia } from '../lib/supabase';
-import { mockApi } from '../lib/mockData';
+import { api } from '../lib/api';
 
 export default function GallerySection() {
   const [media, setMedia] = useState<GalleryMedia[]>([]);
@@ -14,7 +14,7 @@ export default function GallerySection() {
 
   async function fetchGallery() {
     try {
-      const data = await mockApi.getGalleryMedia();
+      const data = await api.getGalleryMedia();
       const filteredData = data.filter(item => item.media_type === 'foto').slice(0, 10);
       setMedia(filteredData.length > 0 ? filteredData : getDefaultImages());
     } catch (error) {
@@ -27,21 +27,12 @@ export default function GallerySection() {
   function getDefaultImages(): GalleryMedia[] {
     return [
       {
-        id: '1',
-        event_id: null,
-        media_type: 'foto',
-        media_url: 'https://images.pexels.com/photos/635499/pexels-photo-635499.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        caption: 'Exposição de Cavalos',
-        display_order: 1,
-        created_at: new Date().toISOString(),
-      },
-      {
         id: '2',
         event_id: null,
         media_type: 'foto',
         media_url: 'https://images.pexels.com/photos/1595104/pexels-photo-1595104.jpeg?auto=compress&cs=tinysrgb&w=1200',
         caption: 'Feira Agropecuária',
-        display_order: 2,
+        display_order: 1,
         created_at: new Date().toISOString(),
       },
       {
@@ -50,7 +41,7 @@ export default function GallerySection() {
         media_type: 'foto',
         media_url: 'https://images.pexels.com/photos/162240/farm-cows-cattle-livestock-162240.jpeg?auto=compress&cs=tinysrgb&w=1200',
         caption: 'Exposição de Gado',
-        display_order: 3,
+        display_order: 2,
         created_at: new Date().toISOString(),
       },
       {
@@ -59,7 +50,7 @@ export default function GallerySection() {
         media_type: 'foto',
         media_url: 'https://images.pexels.com/photos/972995/pexels-photo-972995.jpeg?auto=compress&cs=tinysrgb&w=1200',
         caption: 'Cavalgada Tradicional',
-        display_order: 4,
+        display_order: 3,
         created_at: new Date().toISOString(),
       },
     ];
@@ -75,38 +66,24 @@ export default function GallerySection() {
 
   if (loading) {
     return (
-      <section id="galeria" className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4 text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-700 border-t-transparent"></div>
+      <section id="galeria" className="py-20 md:py-24 bg-white">
+        <div className="container mx-auto px-4 text-center max-w-7xl">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent" />
         </div>
       </section>
     );
   }
 
   return (
-    <section id="galeria" className="py-24 bg-gradient-to-br from-gray-50 via-white to-primary-50/30 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-primary-100/20 to-transparent rounded-full -translate-y-40 translate-x-40"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-primary-100/20 to-transparent rounded-full translate-y-48 -translate-x-48"></div>
-      
-      <div className="container mx-auto px-4 relative">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></div>
-            Galeria de Eventos
-          </div>
-          
-          <h2 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="text-gray-800">
-              Momentos Únicos
-            </span>
-            <br />
-            <span className="text-primary-600">
-              que Marcam o Campo
-            </span>
+    <section id="galeria" className="py-20 md:py-24 bg-white relative overflow-hidden">
+      <div className="container mx-auto px-4 relative max-w-7xl">
+        <div className="text-center mb-14">
+          <span className="section-label">Galeria</span>
+          <h2 className="section-title">
+            <span className="block">Momentos Únicos</span>
+            <span className="block section-title-accent">que Marcam o Campo</span>
           </h2>
-          
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="section-lead">
             Reviva os momentos mais marcantes das edições anteriores e sinta a energia dos nossos eventos
           </p>
         </div>
@@ -114,7 +91,7 @@ export default function GallerySection() {
         <div className="max-w-6xl mx-auto">
           <div className="relative group">
             <div
-              className="h-96 md:h-[600px] bg-cover bg-center rounded-3xl overflow-hidden shadow-2xl"
+              className="h-96 md:h-[520px] bg-cover bg-center rounded-2xl overflow-hidden shadow-lg border border-gray-100"
               style={{
                 backgroundImage: `url(${media[currentIndex]?.media_url})`,
               }}
@@ -148,7 +125,7 @@ export default function GallerySection() {
 
           {/* Thumbnail navigation */}
           <div className="flex justify-center mt-8">
-            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl shadow-lg border border-white/50">
+            <div className="bg-white/90 backdrop-blur-sm p-4 rounded-2xl shadow-md border border-gray-100">
               <div className="flex space-x-3">
                 {media.map((item, index) => (
               <button

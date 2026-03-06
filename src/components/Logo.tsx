@@ -5,10 +5,10 @@ interface LogoProps {
 
 export default function Logo({ size = 'md', className = '' }: LogoProps) {
   const sizeClasses = {
-    sm: 'w-20 h-20',
-    md: 'w-28 h-28',
-    lg: 'w-36 h-36',
-    xl: 'w-44 h-44'
+    sm: 'w-16 h-16',
+    md: 'w-24 h-24',
+    lg: 'w-28 h-28',
+    xl: 'w-36 h-36'
   };
 
 

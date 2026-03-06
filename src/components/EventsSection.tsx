@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Calendar, MapPin, User } from 'lucide-react';
 import { Event, EventType } from '../lib/supabase';
-import { mockApi } from '../lib/mockData';
+import { api } from '../lib/api';
 
 export default function EventsSection() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -15,7 +15,7 @@ export default function EventsSection() {
   async function fetchEvents() {
     setLoading(true);
     try {
-      const data = await mockApi.getEvents();
+      const data = await api.getEvents();
       let filteredEvents = data.filter(event => 
         event.status === 'publicado' && 
         new Date(event.event_date) >= new Date()
@@ -63,35 +63,21 @@ export default function EventsSection() {
   };
 
   return (
-    <section id="eventos" className="py-24 bg-gradient-to-br from-white via-gray-50 to-primary-50/20 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-br from-primary-100/30 to-transparent rounded-full -translate-y-36 -translate-x-36"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-primary-100/20 to-transparent rounded-full translate-y-48 translate-x-48"></div>
-      
-      <div className="container mx-auto px-4 relative">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <Calendar className="w-4 h-4" />
-            Próximos Eventos
-          </div>
-          
-          <h2 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="text-gray-800">
-              Eventos que Conectam
-            </span>
-            <br />
-            <span className="text-primary-600">
-              o Campo e a Tradição
-            </span>
+    <section id="eventos" className="py-20 md:py-24 bg-gray-50/80 relative overflow-hidden">
+      <div className="container mx-auto px-4 relative max-w-7xl">
+        <div className="text-center mb-14">
+          <span className="section-label">Próximos eventos</span>
+          <h2 className="section-title">
+            <span className="block">Eventos que Conectam</span>
+            <span className="block section-title-accent">o Campo e a Tradição</span>
           </h2>
-          
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="section-lead">
             Confira a programação dos nossos eventos e participe de experiências únicas que celebram o agronegócio
           </p>
         </div>
 
-        <div className="flex justify-center mb-16">
-          <div className="bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-white/50">
+        <div className="flex justify-center mb-14">
+          <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
             <div className="flex flex-wrap gap-2">
               {eventTypes.map((type) => (
                 <button
@@ -111,11 +97,11 @@ export default function EventsSection() {
         </div>
 
         {loading ? (
-          <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-2xl mb-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-4 border-white border-t-transparent"></div>
+          <div className="text-center py-20">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-primary-600 rounded-2xl mb-4">
+              <div className="animate-spin rounded-full h-7 w-7 border-2 border-white border-t-transparent" />
             </div>
-            <p className="text-gray-600 text-lg">Carregando eventos...</p>
+            <p className="text-gray-600">Carregando eventos...</p>
           </div>
         ) : events.length === 0 ? (
           <div className="text-center py-16">
@@ -125,11 +111,11 @@ export default function EventsSection() {
             <p className="text-gray-600 text-lg">Nenhum evento encontrado nesta categoria.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {events.map((event, index) => (
               <div
                 key={event.id}
-                className="group bg-white/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 card-hover border border-white/50"
+                className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100/80"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="relative h-56 overflow-hidden">

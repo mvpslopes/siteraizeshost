@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Calendar, FileText, Users, TrendingUp, DollarSign, AlertCircle, UserCheck, Truck } from 'lucide-react';
-import { mockApi } from '../../lib/mockData';
+import { api } from '../../lib/api';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -24,8 +24,8 @@ export default function Dashboard() {
 
   async function fetchStats() {
     const [events, assessments] = await Promise.all([
-      mockApi.getEvents(),
-      mockApi.getViabilityAssessments()
+      api.getEvents(),
+      api.getViabilityAssessments()
     ]);
 
     const upcomingEvents = events.filter(event => 

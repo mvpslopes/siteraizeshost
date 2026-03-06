@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Calculator, DollarSign, TrendingUp, Trash2, Save, Download, Upload } from 'lucide-react';
 import { Event } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { mockApi } from '../../lib/mockData';
+import { api } from '../../lib/api';
 
 interface Cost {
   id: string;
@@ -65,7 +65,7 @@ export default function ViabilityAssessmentComponent() {
 
   async function fetchEvents() {
     try {
-      const data = await mockApi.getEvents();
+      const data = await api.getEvents();
       setEvents(data.sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()));
     } catch (error) {
       console.error('Erro ao carregar eventos:', error);

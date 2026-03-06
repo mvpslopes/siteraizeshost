@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
+import SocialProofSection from './components/SocialProofSection';
+import PartnersSection from './components/PartnersSection';
 import AboutSection from './components/AboutSection';
 import EventsSection from './components/EventsSection';
 import GallerySection from './components/GallerySection';
@@ -48,20 +50,12 @@ function AppContent() {
   }
 
   if (currentPage === 'login' && !user) {
-    return (
-      <>
-        <Header onNavigate={handleNavigate} />
-        <LoginPage onBack={() => setCurrentPage('home')} />
-      </>
-    );
+    return <LoginPage onBack={() => setCurrentPage('home')} />;
   }
 
   if (currentPage === 'admin' && user) {
     return (
-      <>
-        <Header onNavigate={handleNavigate} />
-        <AdminPanel />
-      </>
+      <AdminPanel />
     );
   }
 

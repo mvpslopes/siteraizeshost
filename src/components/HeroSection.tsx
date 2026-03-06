@@ -1,4 +1,4 @@
-import { ChevronDown, Sparkles, TreePine } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface HeroSectionProps {
   onNavigate: (section: string) => void;
@@ -6,79 +6,114 @@ interface HeroSectionProps {
 
 export default function HeroSection({ onNavigate }: HeroSectionProps) {
   return (
-    <section
-      className="relative h-screen flex items-center justify-center text-white overflow-hidden"
-      style={{
-        backgroundImage: 'url(https://images.pexels.com/photos/635499/pexels-photo-635499.jpeg?auto=compress&cs=tinysrgb&w=1920)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      {/* Overlay com gradiente mais sofisticado */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-primary-900/30"></div>
-      
-      {/* Elementos decorativos flutuantes */}
-      <div className="absolute top-20 left-10 animate-float">
-        <Sparkles className="w-8 h-8 text-primary-400 opacity-60" />
-      </div>
-      <div className="absolute top-32 right-16 animate-float-delayed">
-        <TreePine className="w-12 h-12 text-primary-500 opacity-50" />
-      </div>
-      <div className="absolute bottom-32 left-20 animate-float-slow">
-        <Sparkles className="w-6 h-6 text-primary-400 opacity-40" />
-      </div>
+    <section className="relative bg-gradient-to-b from-white via-primary-50/20 to-gray-50/50 pt-28 pb-24 md:pt-32 md:pb-28 overflow-hidden">
+      {/* Elementos decorativos de fundo */}
+      <div className="pointer-events-none absolute -left-32 -top-32 h-72 w-72 rounded-full bg-primary-100/80 blur-3xl opacity-50" />
+      <div className="pointer-events-none absolute right-0 top-40 h-80 w-80 rounded-full bg-primary-100/70 blur-3xl opacity-40" />
 
-      <div className="relative z-10 text-center px-4 max-w-5xl">
-        {/* Badge superior */}
-        <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-2 mb-8 animate-fade-in">
-          <div className="w-2 h-2 bg-primary-400 rounded-full animate-pulse"></div>
-          <span className="text-sm font-medium text-white/90">Eventos Agropecuários de Excelência</span>
+      <div className="container mx-auto px-4 relative max-w-7xl">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Coluna de texto (esquerda) */}
+          <div className="max-w-xl">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-100 mb-6">
+              <span className="w-2 h-2 rounded-full bg-primary-500" />
+              <span className="text-xs font-semibold uppercase tracking-wide text-primary-700">
+                Eventos agro com DNA Raízes
+              </span>
+            </div>
+
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-6 leading-[1.1]">
+              <span className="block">Revolucionando o</span>
+              <span className="block text-primary-600">agronegócio brasileiro</span>
+              <span className="block">com grandes eventos</span>
+            </h1>
+
+            <p className="text-lg md:text-xl text-gray-600 leading-relaxed mb-8 max-w-xl">
+              Conectamos produtores, investidores e apaixonados pelo campo em experiências
+              únicas, que geram relacionamento, negócios e fortalecem a cultura rural.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <button
+                onClick={() => onNavigate('eventos')}
+                className="group bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl text-base md:text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+              >
+                Explorar próximos eventos
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              <button
+                onClick={() => onNavigate('sobre')}
+                className="group bg-white/80 backdrop-blur border border-primary-100 hover:bg-white text-primary-900 px-8 py-4 rounded-xl text-base md:text-lg font-semibold transition-all duration-300 flex items-center justify-center"
+              >
+                Conheça a Raízes
+              </button>
+            </div>
+
+            {/* Mini prova social abaixo do texto */}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              <div className="flex -space-x-2">
+                {[1, 2, 3].map(i => (
+                  <div
+                    key={i}
+                    className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 border-2 border-white shadow-md"
+                  />
+                ))}
+              </div>
+              <p>
+                <span className="font-semibold text-gray-900">Mais de 50 mil pessoas</span>{' '}
+                já participaram de eventos organizados pela Raízes.
+              </p>
+            </div>
+          </div>
+
+          {/* Coluna visual (direita) */}
+          <div className="relative">
+            <div className="relative rounded-3xl bg-white shadow-2xl border border-gray-100 overflow-hidden">
+              {/* Imagem principal */}
+              <div
+                className="h-64 sm:h-80 md:h-96 bg-cover bg-center"
+                style={{
+                  backgroundImage:
+                    'url(/silhueta-de-garanhao-pastando-em-pastagem-de-montanha-gerada-por-ia.jpg)',
+                }}
+              />
+
+              {/* Barra de infos na base da imagem */}
+              <div className="px-6 py-4 bg-white/95 backdrop-blur border-t border-gray-100">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">
+                      Eventos realizados
+                    </p>
+                    <p className="text-xl font-bold text-gray-900">500+</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">
+                      Cidades atendidas
+                    </p>
+                    <p className="text-xl font-bold text-gray-900">100+</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Cartão flutuante de destaque */}
+            <div className="absolute -bottom-8 -left-4 bg-white rounded-2xl shadow-lg border border-primary-100 px-5 py-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-lg font-bold">
+                15+
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-primary-600 font-semibold">
+                  Anos de atuação
+                </p>
+                <p className="text-sm text-gray-700">
+                  Experiência em feiras, leilões, exposições e cavalgadas.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-slide-up">
-          <span className="text-white">
-            Conectando o campo
-          </span>
-          <br />
-          <span className="text-white">
-            e a tradição através de
-          </span>
-          <br />
-          <span className="text-primary-300">
-            grandes eventos
-          </span>
-        </h1>
-        
-        <p className="text-xl md:text-2xl mb-8 text-neutral-200 max-w-3xl mx-auto leading-relaxed animate-slide-up-delayed">
-          Valorizando o agronegócio e celebrando nossa cultura rural com eventos únicos que unem tradição e inovação
-        </p>
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-delayed">
-          <button
-            onClick={() => onNavigate('eventos')}
-            className="bg-primary-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-primary-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            Conheça nossos próximos eventos
-          </button>
-          
-          <button
-            onClick={() => onNavigate('sobre')}
-            className="group bg-white/10 backdrop-blur-sm border border-white/20 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white/20 transition-all duration-300 transform hover:scale-105"
-          >
-            Nossa História
-          </button>
-        </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <button
-          onClick={() => onNavigate('sobre')}
-          className="flex flex-col items-center text-white/70 hover:text-white transition-colors"
-        >
-          <span className="text-sm mb-2">Descubra mais</span>
-          <ChevronDown className="w-6 h-6" />
-        </button>
       </div>
     </section>
   );

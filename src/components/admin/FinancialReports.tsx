@@ -10,7 +10,7 @@ import {
   Target
 } from 'lucide-react';
 import { Event, FinancialTransaction } from '../../lib/supabase';
-import { mockApi } from '../../lib/mockData';
+import { api } from '../../lib/api';
 
 interface FinancialSummary {
   totalRevenue: number;
@@ -49,7 +49,7 @@ export default function FinancialReports() {
 
   async function fetchEvents() {
     try {
-      const data = await mockApi.getEvents();
+      const data = await api.getEvents();
       setEvents(data.sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()));
     } catch (error) {
       console.error('Erro ao carregar eventos:', error);

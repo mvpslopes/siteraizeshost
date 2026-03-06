@@ -40,14 +40,16 @@ export default function LoginPage({ onBack }: LoginPageProps) {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-primary-700 font-medium mb-2">E-mail</label>
+              <label className="block text-primary-700 font-medium mb-2">
+                E-mail ou usuário
+              </label>
               <input
-                type="email"
+                type="text"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-earth-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-700"
-                placeholder="seu@email.com"
+                placeholder="seu@email.com ou marcus.lopes"
               />
             </div>
 

@@ -20,74 +20,67 @@ export default function Header({ onNavigate }: HeaderProps) {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50">
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-md border-b border-white/20"></div>
-      <div className="relative container mx-auto px-4 py-3 flex items-center justify-between">
-        <div className="cursor-pointer -m-2 group" onClick={() => onNavigate('inicio')}>
-          <div className="transform group-hover:scale-105 transition-transform duration-300">
-          <Logo size="lg" />
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-gray-100/80">
+      <div className="absolute inset-0 bg-white/95 backdrop-blur-md" />
+      <div className="relative container mx-auto px-4 py-3 flex items-center justify-between max-w-7xl">
+        <div className="cursor-pointer group" onClick={() => onNavigate('inicio')}>
+          <div className="transform group-hover:scale-[1.02] transition-transform duration-300">
+            <Logo size="sm" />
           </div>
         </div>
 
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center gap-8">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className="relative text-neutral-700 hover:text-primary-700 font-medium transition-all duration-300 group"
+              className="relative text-gray-600 hover:text-primary-600 font-medium text-sm transition-colors duration-200 py-2 group"
             >
               {item.label}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-700 transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-200 group-hover:w-full" />
             </button>
           ))}
           {user ? (
             <>
               <button
                 onClick={() => onNavigate('admin')}
-                className="relative text-neutral-700 hover:text-primary-700 font-medium transition-all duration-300 group"
+                className="relative text-gray-600 hover:text-primary-600 font-medium text-sm transition-colors duration-200 py-2 group"
               >
-                Painel Administrativo
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-700 transition-all duration-300 group-hover:w-full"></span>
+                Painel
+                <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary-500 transition-all duration-200 group-hover:w-full" />
               </button>
               <button
                 onClick={signOut}
-                className="relative text-neutral-700 hover:text-accent-600 font-medium transition-all duration-300 group"
+                className="text-gray-500 hover:text-gray-700 font-medium text-sm transition-colors duration-200 py-2"
               >
                 Sair
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-accent-600 to-accent-500 transition-all duration-300 group-hover:w-full"></span>
               </button>
             </>
-          ) : (
-            <button
-              onClick={() => onNavigate('login')}
-              className="relative text-neutral-700 hover:text-primary-700 font-medium transition-all duration-300 group"
-            >
-              Acesso Interno
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-700 transition-all duration-300 group-hover:w-full"></span>
-            </button>
-          )}
+          ) : null}
         </nav>
 
-        <div className="hidden md:flex items-center gap-4">
-        <button
-          onClick={() => onNavigate('login')}
-            className="bg-primary-600 text-white px-6 py-2.5 rounded-xl hover:bg-primary-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
-        >
-          Acesso ao Sistema
-        </button>
-        </div>
+        {!user && (
+          <div className="hidden md:block">
+            <button
+              onClick={() => onNavigate('login')}
+              className="bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-xl transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg"
+            >
+              Acesso ao Sistema
+            </button>
+          </div>
+        )}
 
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden text-gray-700 hover:text-primary-700 transition-colors p-2 rounded-lg hover:bg-white/50"
+          className="md:hidden text-gray-700 hover:text-primary-600 transition-colors p-2 rounded-lg hover:bg-gray-100"
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-t border-white/20 shadow-xl">
-          <nav className="container mx-auto px-4 py-6 flex flex-col space-y-4">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white/98 backdrop-blur-md shadow-lg border-t border-gray-100">
+          <nav className="container mx-auto px-4 py-5 flex flex-col gap-1 max-w-7xl">
             {menuItems.map((item) => (
               <button
                 key={item.id}
@@ -95,12 +88,9 @@ export default function Header({ onNavigate }: HeaderProps) {
                   onNavigate(item.id);
                   setMobileMenuOpen(false);
                 }}
-                className="text-left text-neutral-700 hover:text-primary-700 font-medium transition-all duration-300 py-3 px-4 rounded-lg hover:bg-primary-50 group"
+                className="text-left text-gray-700 hover:text-primary-600 font-medium py-3 px-4 rounded-xl hover:bg-primary-50/80 transition-colors"
               >
-                <span className="relative">
                 {item.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-                </span>
               </button>
             ))}
             {user ? (
@@ -110,51 +100,33 @@ export default function Header({ onNavigate }: HeaderProps) {
                     onNavigate('admin');
                     setMobileMenuOpen(false);
                   }}
-                  className="text-left text-neutral-700 hover:text-primary-700 font-medium transition-all duration-300 py-3 px-4 rounded-lg hover:bg-primary-50 group"
+                  className="text-left text-gray-700 hover:text-primary-600 font-medium py-3 px-4 rounded-xl hover:bg-primary-50/80 transition-colors"
                 >
-                  <span className="relative">
-                  Painel Administrativo
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-                  </span>
+                  Painel
                 </button>
                 <button
                   onClick={() => {
                     signOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="text-left text-neutral-700 hover:text-primary-600 font-medium transition-all duration-300 py-3 px-4 rounded-lg hover:bg-primary-50 group"
+                  className="text-left text-gray-500 hover:text-gray-700 font-medium py-3 px-4 rounded-xl"
                 >
-                  <span className="relative">
                   Sair
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-                  </span>
                 </button>
               </>
             ) : (
-              <button
-                onClick={() => {
-                  onNavigate('login');
-                  setMobileMenuOpen(false);
-                }}
-                className="text-left text-neutral-700 hover:text-primary-700 font-medium transition-all duration-300 py-3 px-4 rounded-lg hover:bg-primary-50 group"
-              >
-                <span className="relative">
-                Acesso Interno
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-                </span>
-              </button>
+              <div className="pt-3 mt-2 border-t border-gray-100">
+                <button
+                  onClick={() => {
+                    onNavigate('login');
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-primary-600 text-white px-6 py-3.5 rounded-xl hover:bg-primary-700 font-medium shadow-md"
+                >
+                  Acesso ao Sistema
+                </button>
+              </div>
             )}
-            <div className="pt-4 border-t border-gray-200">
-            <button
-              onClick={() => {
-                onNavigate('login');
-                setMobileMenuOpen(false);
-              }}
-                className="w-full bg-primary-600 text-white px-6 py-3 rounded-xl hover:bg-primary-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              Acesso ao Sistema
-            </button>
-            </div>
           </nav>
         </div>
       )}

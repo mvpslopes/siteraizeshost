@@ -24,37 +24,23 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contato" className="py-24 bg-gradient-to-br from-white via-primary-50/20 to-primary-50/30 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full -translate-y-48 -translate-x-48"></div>
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tl from-accent-100/20 to-transparent rounded-full translate-y-40 translate-x-40"></div>
-      
-      <div className="container mx-auto px-4 relative">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <MessageCircle className="w-4 h-4" />
-            Entre em Contato
-          </div>
-          
-          <h2 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="text-gray-800">
-              Vamos Realizar
-            </span>
-            <br />
-            <span className="text-primary-600">
-              seu Próximo Evento
-            </span>
+    <section id="contato" className="py-20 md:py-24 bg-primary-50/30 relative overflow-hidden">
+      <div className="container mx-auto px-4 relative max-w-7xl">
+        <div className="text-center mb-14">
+          <span className="section-label">Contato</span>
+          <h2 className="section-title">
+            <span className="block">Vamos Realizar</span>
+            <span className="block section-title-accent">seu Próximo Evento</span>
           </h2>
-          
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="section-lead">
             Estamos prontos para transformar sua ideia em um evento inesquecível que conecta tradição e inovação
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 max-w-6xl mx-auto">
           {/* Contact Form */}
-          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white/50">
-            <h3 className="text-3xl font-bold text-gray-800 mb-8">Fale Conosco</h3>
+          <div className="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-gray-100/80">
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Fale Conosco</h3>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-gray-700 font-semibold mb-3">Nome Completo</label>
@@ -113,7 +99,7 @@ export default function ContactSection() {
 
           {/* Contact Information */}
           <div className="space-y-8">
-            <div className="bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white/50">
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
               <h3 className="text-3xl font-bold text-gray-800 mb-8">Informações de Contato</h3>
               <div className="space-y-6">
                 <div className="flex items-start group">
@@ -183,7 +169,7 @@ export default function ContactSection() {
             </div>
 
             {/* Map */}
-            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 overflow-hidden">
+            <div className="bg-white/95 backdrop-blur-sm p-4 rounded-2xl shadow-md border border-gray-100 overflow-hidden">
               <div className="h-80 rounded-2xl overflow-hidden">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d234013.46292881698!2d-46.87501955!3d-23.6824124!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce448183a461d1%3A0x9ba94b08ff335bae!2sS%C3%A3o%20Paulo%2C%20SP!5e0!3m2!1spt-BR!2sbr!4v1234567890123!5m2!1spt-BR!2sbr"

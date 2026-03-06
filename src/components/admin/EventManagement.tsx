@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Edit, Trash2, Calendar, MapPin } from 'lucide-react';
 import { Event, EventType, EventStatus } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { mockApi } from '../../lib/mockData';
+import { api } from '../../lib/api';
 
 export default function EventManagement() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -30,7 +30,7 @@ export default function EventManagement() {
 
   async function fetchEvents() {
     try {
-      const data = await mockApi.getEvents();
+      const data = await api.getEvents();
       setEvents(data.sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()));
     } catch (error) {
       console.error('Erro ao carregar eventos:', error);
@@ -43,9 +43,9 @@ export default function EventManagement() {
 
     try {
       if (editingEvent) {
-        await mockApi.updateEvent(editingEvent.id, formData);
+        await api.updateEvent(editingEvent.id, formData);
       } else {
-        await mockApi.createEvent({
+        await api.createEvent({
           ...formData,
           created_by: user?.id || '1',
         });
@@ -77,7 +77,7 @@ export default function EventManagement() {
   const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir este evento?')) {
       try {
-        await mockApi.deleteEvent(id);
+        await api.deleteEvent(id);
         await fetchEvents();
       } catch (error) {
         console.error('Erro ao excluir evento:', error);
@@ -122,6 +122,11 @@ export default function EventManagement() {
     );
   };
 
+  const getEventCode = (index: number) => {
+    const sequential = index + 1;
+    return sequential.toString().padStart(4, '0');
+  };
+
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -133,7 +138,7 @@ export default function EventManagement() {
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Gerenciar Eventos</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Eventos</h1>
         <button
           onClick={() => setShowForm(true)}
           className="bg-primary-700 text-white px-6 py-3 rounded-lg hover:bg-primary-800 transition flex items-center font-medium"
@@ -287,13 +292,16 @@ export default function EventManagement() {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Evento
+                  Código
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Tipo
+                  Nome do Evento
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Data
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Local
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Status
@@ -304,20 +312,26 @@ export default function EventManagement() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {events.map((event) => (
+              {events.map((event, index) => (
                 <tr key={event.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-600 font-mono">
+                    {getEventCode(index)}
+                  </td>
                   <td className="px-6 py-4">
                     <div className="font-medium text-gray-800">{event.name}</div>
-                    <div className="text-sm text-gray-600 flex items-center mt-1">
-                      <MapPin className="w-3 h-3 mr-1" />
-                      {event.location}
-                    </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600 capitalize">{event.type}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
                       {new Date(event.event_date).toLocaleDateString('pt-BR')}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    <div className="flex items-center">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      <span className="truncate max-w-xs inline-block align-middle">
+                        {event.location}
+                      </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">{getStatusBadge(event.status)}</td>
