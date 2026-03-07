@@ -1,6 +1,8 @@
-import { Heart, Award, Users, Leaf, TrendingUp, Globe, Star } from 'lucide-react';
+import { Heart, Award, Users, Leaf } from 'lucide-react';
+import { useInView } from '../hooks/useInView';
 
 export default function AboutSection() {
+  const { ref: sectionRef, isInView } = useInView();
   const values = [
     {
       icon: <Heart className="w-8 h-8" />,
@@ -36,60 +38,50 @@ export default function AboutSection() {
     },
   ];
 
-  const stats = [
-    { number: '500+', label: 'Eventos Realizados', icon: <TrendingUp className="w-6 h-6" /> },
-    { number: '50K+', label: 'Participantes', icon: <Users className="w-6 h-6" /> },
-    { number: '15+', label: 'Anos de Experiência', icon: <Star className="w-6 h-6" /> },
-    { number: '100+', label: 'Cidades Atendidas', icon: <Globe className="w-6 h-6" /> },
-  ];
-
   return (
-    <section id="sobre" className="py-20 md:py-24 bg-white relative overflow-hidden">
+    <section id="sobre" ref={sectionRef as React.RefObject<HTMLElement>} className="py-20 md:py-24 bg-white relative overflow-hidden">
       <div className="container mx-auto px-4 relative max-w-7xl">
         {/* Header Section */}
-        <div className="max-w-4xl mx-auto mb-16 md:mb-20 text-center">
-          <span className="section-label">Sobre nós</span>
+        <div className={`max-w-4xl mb-12 text-left reveal-on-scroll ${isInView ? 'visible' : ''}`}>
+          <span className="section-label">Sobre a empresa</span>
           <h2 className="section-title">
-            <span className="block">Conectando Tradição</span>
-            <span className="block section-title-accent">e Inovação no Campo</span>
+            <span className="block section-title-accent">Raízes Eventos</span>
           </h2>
-          <p className="section-lead">
-            Há anos, a <span className="font-semibold text-primary-600">Raízes Eventos</span> tem sido referência na organização de eventos agropecuários,
-            feiras, exposições, leilões e cavalgadas. Nossa missão é promover o desenvolvimento do
-            agronegócio enquanto celebramos nossas raízes e tradições rurais.
+        </div>
+
+        {/* Texto institucional */}
+        <div className={`max-w-4xl space-y-6 text-gray-600 text-lg md:text-xl leading-relaxed text-left text-justify reveal-on-scroll reveal-delay-1 ${isInView ? 'visible' : ''}`}>
+          <p>
+            A Raízes Eventos é uma empresa especializada na criação, planejamento e realização de eventos ligados ao agronegócio e às tradições do campo.
+          </p>
+          <p>
+            Com uma proposta moderna e profissional, atuamos no desenvolvimento de projetos que valorizam a cultura rural, fortalecem o relacionamento entre criadores, empresas e público, e criam ambientes ideais para geração de negócios e visibilidade de marca.
+          </p>
+          <p>
+            Mais do que organizar eventos, a Raízes trabalha para transformar cada projeto em uma experiência bem estruturada, capaz de reunir tradição, organização e estratégia.
+          </p>
+          <p>
+            Nosso compromisso é entregar eventos que contribuam para o crescimento do setor, valorizando o trabalho de haras, criadores, patrocinadores e parceiros.
           </p>
         </div>
 
-        {/* Stats Section */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-16 md:mb-20">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="bg-white p-6 md:p-8 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100/80 text-center"
-            >
-              <div className="flex items-center justify-center w-14 h-14 bg-primary-600 rounded-xl mb-6 mx-auto">
-                <div className="text-white">{stat.icon}</div>
-              </div>
-              <div className="text-4xl md:text-5xl font-bold text-primary-600 mb-2">{stat.number}</div>
-              <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Values Section */}
-        <div>
-          <div className="text-center mb-10">
-            <h3 className="text-2xl md:text-3xl font-bold text-gray-800">
+        {/* Values Section - mesmo estilo de fundo do rodapé */}
+        <div className="mt-16 md:mt-20 rounded-3xl relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-earth-900 p-8 md:p-12">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-primary-500/10 rounded-full -translate-y-48 -translate-x-48 pointer-events-none" aria-hidden />
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary-400/10 rounded-full translate-y-40 translate-x-40 pointer-events-none" aria-hidden />
+          <div className="relative text-left mb-10">
+            <h3 className="text-2xl md:text-3xl font-bold text-white">
               Nossos Valores
             </h3>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="relative grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {values.map((value, index) => (
               <div
                 key={index}
-                className="group bg-white p-6 md:p-8 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100/80 text-center"
+                className={`group bg-white p-6 md:p-8 rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 motion-reduce:transition-none border border-white/20 text-left reveal-on-scroll ${isInView ? 'visible' : ''}`}
+                style={{ transitionDelay: isInView ? `${(index + 2) * 60}ms` : '0ms' }}
               >
-                <div className={`flex justify-center mb-6 w-16 h-16 ${value.iconBg} rounded-2xl mx-auto group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`flex justify-center mb-6 w-16 h-16 ${value.iconBg} rounded-2xl mx-auto group-hover:scale-110 transition-transform duration-300 motion-reduce:group-hover:scale-100`}>
                   <div className="text-white flex items-center justify-center">{value.icon}</div>
                 </div>
                 
@@ -97,7 +89,7 @@ export default function AboutSection() {
                   {value.title}
                 </h3>
                 
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 text-lg leading-relaxed text-justify">
                   {value.description}
                 </p>
               </div>

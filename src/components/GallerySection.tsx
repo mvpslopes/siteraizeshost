@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { GalleryMedia } from '../lib/supabase';
 import { api } from '../lib/api';
+import { useInView } from '../hooks/useInView';
 
 export default function GallerySection() {
+  const { ref: sectionRef, isInView } = useInView();
   const [media, setMedia] = useState<GalleryMedia[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -66,7 +68,7 @@ export default function GallerySection() {
 
   if (loading) {
     return (
-      <section id="galeria" className="py-20 md:py-24 bg-white">
+      <section id="galeria" className="py-20 md:py-24 bg-primary-50">
         <div className="container mx-auto px-4 text-center max-w-7xl">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent" />
         </div>
@@ -75,9 +77,9 @@ export default function GallerySection() {
   }
 
   return (
-    <section id="galeria" className="py-20 md:py-24 bg-white relative overflow-hidden">
+    <section id="galeria" ref={sectionRef as React.RefObject<HTMLElement>} className="py-20 md:py-24 bg-primary-50 relative overflow-hidden">
       <div className="container mx-auto px-4 relative max-w-7xl">
-        <div className="text-center mb-14">
+        <div className={`text-center mb-14 reveal-on-scroll ${isInView ? 'visible' : ''}`}>
           <span className="section-label">Galeria</span>
           <h2 className="section-title">
             <span className="block">Momentos Únicos</span>
@@ -91,7 +93,8 @@ export default function GallerySection() {
         <div className="max-w-6xl mx-auto">
           <div className="relative group">
             <div
-              className="h-96 md:h-[520px] bg-cover bg-center rounded-2xl overflow-hidden shadow-lg border border-gray-100"
+              key={currentIndex}
+              className="h-96 md:h-[520px] bg-cover bg-center rounded-2xl overflow-hidden shadow-lg border border-gray-100 animate-fade-in"
               style={{
                 backgroundImage: `url(${media[currentIndex]?.media_url})`,
               }}
@@ -110,14 +113,14 @@ export default function GallerySection() {
 
             <button
               onClick={handlePrev}
-              className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white p-4 rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-110 group-hover:opacity-100 opacity-0"
+              className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white p-4 rounded-2xl shadow-xl transition-all duration-300 motion-reduce:transition-none transform hover:scale-110 motion-reduce:hover:scale-100 opacity-100 md:opacity-0 md:group-hover:opacity-100"
             >
               <ChevronLeft className="w-6 h-6 text-gray-800" />
             </button>
 
             <button
               onClick={handleNext}
-              className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white p-4 rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-110 group-hover:opacity-100 opacity-0"
+              className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white p-4 rounded-2xl shadow-xl transition-all duration-300 motion-reduce:transition-none transform hover:scale-110 motion-reduce:hover:scale-100 opacity-100 md:opacity-0 md:group-hover:opacity-100"
             >
               <ChevronRight className="w-6 h-6 text-gray-800" />
             </button>

@@ -1,7 +1,12 @@
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Instagram, MessageCircle } from 'lucide-react';
+import { Mail, MapPin, Instagram, MessageCircle } from 'lucide-react';
+import { useInView } from '../hooks/useInView';
+import { formatPhone } from '../utils/formatPhone';
+
+const WHATSAPP_MENSAGEM_PADRAO = 'Olá, vim pelo site da Raízes Eventos!';
 
 export default function ContactSection() {
+  const { ref: sectionRef, isInView } = useInView();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,16 +29,16 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contato" className="py-20 md:py-24 bg-primary-50/30 relative overflow-hidden">
+    <section id="contato" ref={sectionRef as React.RefObject<HTMLElement>} className="py-20 md:py-24 bg-white relative overflow-hidden">
       <div className="container mx-auto px-4 relative max-w-7xl">
-        <div className="text-center mb-14">
+        <div className={`text-center mb-14 reveal-on-scroll ${isInView ? 'visible' : ''}`}>
           <span className="section-label">Contato</span>
           <h2 className="section-title">
-            <span className="block">Vamos Realizar</span>
-            <span className="block section-title-accent">seu Próximo Evento</span>
+            <span className="block">Vamos construir juntos</span>
+            <span className="block section-title-accent">o próximo evento</span>
           </h2>
           <p className="section-lead">
-            Estamos prontos para transformar sua ideia em um evento inesquecível que conecta tradição e inovação
+            Se você representa um haras, empresa ou deseja desenvolver um projeto no setor, entre em contato conosco.
           </p>
         </div>
 
@@ -78,7 +83,7 @@ export default function ContactSection() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-primary-600 text-white px-8 py-4 rounded-xl hover:bg-primary-700 transition-all duration-300 font-semibold disabled:opacity-50 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                className="w-full bg-primary-600 text-white px-8 py-4 rounded-xl hover:bg-primary-700 transition-all duration-300 motion-reduce:transition-none font-semibold disabled:opacity-50 transform hover:scale-[1.02] motion-reduce:hover:scale-100 shadow-lg hover:shadow-xl active:scale-[0.98] motion-reduce:active:scale-100"
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-3">
@@ -86,11 +91,11 @@ export default function ContactSection() {
                     Enviando...
                   </div>
                 ) : (
-                  'Enviar Mensagem'
+                  'Fale com a nossa equipe'
                 )}
               </button>
               {success && (
-                <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl text-center font-medium">
+                <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl text-center font-medium animate-fade-in">
                   ✅ Mensagem enviada com sucesso! Entraremos em contato em breve.
                 </div>
               )}
@@ -103,82 +108,47 @@ export default function ContactSection() {
               <h3 className="text-3xl font-bold text-gray-800 mb-8">Informações de Contato</h3>
               <div className="space-y-6">
                 <div className="flex items-start group">
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl mr-4 group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform duration-300 motion-reduce:group-hover:scale-100">
                     <Mail className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-800 text-lg">E-mail</h4>
-                    <p className="text-gray-600">contato@raizeseventos.com.br</p>
+                    <h4 className="font-bold text-gray-800 text-lg mb-2">Email</h4>
+                    <a href="mailto:contato@raizeseventos.com.br" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">contato@raizeseventos.com.br</a>
                   </div>
                 </div>
                 
                 <div className="flex items-start group">
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl mr-4 group-hover:scale-110 transition-transform duration-300">
-                    <Phone className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-800 text-lg">Telefone</h4>
-                    <p className="text-gray-600">(11) 99999-9999</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start group">
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl mr-4 group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform duration-300 motion-reduce:group-hover:scale-100">
                     <MessageCircle className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-800 text-lg">WhatsApp</h4>
-                    <a
-                      href="https://wa.me/5511999999999"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
-                    >
-                      (11) 99999-9999
-                    </a>
+                    <h4 className="font-bold text-gray-800 text-lg mb-2">WhatsApp</h4>
+                    <div className="space-y-2">
+                      <a href={`https://wa.me/553195499897?text=${encodeURIComponent(WHATSAPP_MENSAGEM_PADRAO)}`} target="_blank" rel="noopener noreferrer" className="block text-primary-600 hover:text-primary-700 font-medium transition-colors">Léo Barbosa — {formatPhone('553195499897')}</a>
+                      <a href={`https://wa.me/553196392292?text=${encodeURIComponent(WHATSAPP_MENSAGEM_PADRAO)}`} target="_blank" rel="noopener noreferrer" className="block text-primary-600 hover:text-primary-700 font-medium transition-colors">Thatyane Hoelzle — {formatPhone('553196392292')}</a>
+                    </div>
                   </div>
                 </div>
                 
                 <div className="flex items-start group">
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl mr-4 group-hover:scale-110 transition-transform duration-300">
-                    <Instagram className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-800 text-lg">Instagram</h4>
-                    <a
-                      href="https://instagram.com/raizeseventos"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
-                    >
-                      @raizeseventos
-                    </a>
-                  </div>
-                </div>
-                
-                <div className="flex items-start group">
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl mr-4 group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform duration-300 motion-reduce:group-hover:scale-100">
                     <MapPin className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-800 text-lg">Endereço</h4>
-                    <p className="text-gray-600">São Paulo - SP</p>
+                    <h4 className="font-bold text-gray-800 text-lg mb-2">Localização</h4>
+                    <p className="text-gray-600">Minas Gerais</p>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Map */}
-            <div className="bg-white/95 backdrop-blur-sm p-4 rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-              <div className="h-80 rounded-2xl overflow-hidden">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d234013.46292881698!2d-46.87501955!3d-23.6824124!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce448183a461d1%3A0x9ba94b08ff335bae!2sS%C3%A3o%20Paulo%2C%20SP!5e0!3m2!1spt-BR!2sbr!4v1234567890123!5m2!1spt-BR!2sbr"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                ></iframe>
+                
+                <div className="flex items-start group">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform duration-300 motion-reduce:group-hover:scale-100">
+                    <Instagram className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-800 text-lg mb-2">Instagram</h4>
+                    <a href="https://www.instagram.com/raizeseventosltda/" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">@raizeseventosltda</a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

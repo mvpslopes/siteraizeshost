@@ -5,16 +5,20 @@ import HeroSection from './components/HeroSection';
 import SocialProofSection from './components/SocialProofSection';
 import PartnersSection from './components/PartnersSection';
 import AboutSection from './components/AboutSection';
+import OQueFazemosSection from './components/OQueFazemosSection';
+import ParaHarasSection from './components/ParaHarasSection';
+import ParaPatrocinadoresSection from './components/ParaPatrocinadoresSection';
 import EventsSection from './components/EventsSection';
-import GallerySection from './components/GallerySection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
+import WhatsAppFloat from './components/WhatsAppFloat';
 import LoginPage from './components/LoginPage';
 import AdminPanel from './components/admin/AdminPanel';
+import SplashScreen from './components/SplashScreen';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<string>('home');
-  const { user, loading } = useAuth();
+  const { user, loading, loggingIn, loggingOut } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -42,11 +46,15 @@ function AppContent() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-700 border-t-transparent"></div>
-      </div>
-    );
+    return <SplashScreen subtitle="Carregando..." />;
+  }
+
+  if (loggingIn) {
+    return <SplashScreen subtitle="Entrando..." />;
+  }
+
+  if (loggingOut) {
+    return <SplashScreen subtitle="Saindo..." />;
   }
 
   if (currentPage === 'login' && !user) {
@@ -54,9 +62,7 @@ function AppContent() {
   }
 
   if (currentPage === 'admin' && user) {
-    return (
-      <AdminPanel />
-    );
+    return <AdminPanel />;
   }
 
   return (
@@ -65,11 +71,14 @@ function AppContent() {
       <main>
         <HeroSection onNavigate={handleNavigate} />
         <AboutSection />
+        <OQueFazemosSection />
+        <ParaHarasSection />
+        <ParaPatrocinadoresSection />
         <EventsSection />
-        <GallerySection />
         <ContactSection />
       </main>
       <Footer />
+      <WhatsAppFloat />
     </>
   );
 }

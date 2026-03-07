@@ -1,10 +1,14 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import type { AuthUser } from '../lib/mockUsers';
 
+const SPLASH_DELAY_MS = 1200;
+
 interface AuthContextType {
   user: AuthUser | null;
   profile: AuthUser | null;
   loading: boolean;
+  loggingIn: boolean;
+  loggingOut: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -15,6 +19,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loggingIn, setLoggingIn] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     // Verificar se há usuário salvo no localStorage
@@ -29,7 +35,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('raizes_user');
       }
     }
-    setLoading(false);
+    // Mesmo tempo de splash para visualizar "Carregando..."
+    const t = setTimeout(() => setLoading(false), SPLASH_DELAY_MS);
+    return () => clearTimeout(t);
   }, []);
 
   async function signIn(email: string, password: string) {
@@ -49,9 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const loggedUser: AuthUser = data.user;
+      setLoggingIn(true);
+      await new Promise((resolve) => setTimeout(resolve, SPLASH_DELAY_MS));
       setUser(loggedUser);
       setProfile(loggedUser);
       localStorage.setItem('raizes_user', JSON.stringify(loggedUser));
+      setLoggingIn(false);
 
       return { error: null };
     } catch (err) {
@@ -61,13 +72,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut() {
+    setLoggingOut(true);
+    await new Promise((resolve) => setTimeout(resolve, SPLASH_DELAY_MS));
     setUser(null);
     setProfile(null);
     localStorage.removeItem('raizes_user');
+    setLoggingOut(false);
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, loggingIn, loggingOut, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

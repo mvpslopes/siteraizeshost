@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Logo from './Logo';
+import SplashScreen from './SplashScreen';
 
 interface LoginPageProps {
   onBack: () => void;
@@ -25,6 +26,10 @@ export default function LoginPage({ onBack }: LoginPageProps) {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return <SplashScreen subtitle="Entrando..." />;
+  }
 
   return (
     <div className="min-h-screen bg-neutral-100 flex items-center justify-center px-4 pt-20">

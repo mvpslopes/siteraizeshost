@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Calendar, MapPin, User } from 'lucide-react';
 import { Event, EventType } from '../lib/supabase';
 import { api } from '../lib/api';
+import { useInView } from '../hooks/useInView';
 
 export default function EventsSection() {
+  const { ref: sectionRef, isInView } = useInView();
   const [events, setEvents] = useState<Event[]>([]);
   const [filter, setFilter] = useState<EventType | 'todos'>('todos');
   const [loading, setLoading] = useState(true);
@@ -63,30 +65,35 @@ export default function EventsSection() {
   };
 
   return (
-    <section id="eventos" className="py-20 md:py-24 bg-gray-50/80 relative overflow-hidden">
+    <section id="eventos" ref={sectionRef as React.RefObject<HTMLElement>} className="py-20 md:py-24 relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-earth-900">
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary-500/10 rounded-full -translate-y-48 -translate-x-48 pointer-events-none" aria-hidden />
+      <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary-400/10 rounded-full translate-y-40 translate-x-40 pointer-events-none" aria-hidden />
       <div className="container mx-auto px-4 relative max-w-7xl">
-        <div className="text-center mb-14">
-          <span className="section-label">Próximos eventos</span>
-          <h2 className="section-title">
-            <span className="block">Eventos que Conectam</span>
-            <span className="block section-title-accent">o Campo e a Tradição</span>
+        <div className={`text-center mb-14 reveal-on-scroll ${isInView ? 'visible' : ''}`}>
+          <span className="section-label !text-white font-semibold uppercase tracking-widest">Eventos</span>
+          <h2 className="section-title !text-white">
+            <span className="block !text-white">Projetos e experiências</span>
+            <span className="block !text-white">que valorizam o agro</span>
           </h2>
-          <p className="section-lead">
-            Confira a programação dos nossos eventos e participe de experiências únicas que celebram o agronegócio
+          <p className="section-lead !text-white">
+            A Raízes Eventos trabalha na criação e desenvolvimento de eventos que fortalecem a cultura do campo e promovem encontros importantes para o setor.
+          </p>
+          <p className="!text-white mt-2">
+            Nesta seção você poderá acompanhar nossos projetos, iniciativas e eventos realizados.
           </p>
         </div>
 
         <div className="flex justify-center mb-14">
-          <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+          <div className="bg-white/10 backdrop-blur-sm p-2 rounded-2xl border border-white/20">
             <div className="flex flex-wrap gap-2">
               {eventTypes.map((type) => (
                 <button
                   key={type.value}
                   onClick={() => setFilter(type.value as EventType | 'todos')}
-                  className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+                  className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 motion-reduce:transition-none ${
                     filter === type.value
-                      ? 'bg-primary-600 text-white shadow-lg transform scale-105'
-                      : 'text-gray-700 hover:bg-primary-50 hover:text-primary-700'
+                      ? 'bg-white text-primary-800 shadow-lg transform scale-105 motion-reduce:scale-100'
+                      : 'text-white hover:bg-white/20 hover:text-white'
                   }`}
                 >
                   {type.label}
@@ -98,29 +105,29 @@ export default function EventsSection() {
 
         {loading ? (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-primary-600 rounded-2xl mb-4">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-primary-500 rounded-2xl mb-4">
               <div className="animate-spin rounded-full h-7 w-7 border-2 border-white border-t-transparent" />
             </div>
-            <p className="text-gray-600">Carregando eventos...</p>
+            <p className="text-white">Carregando eventos...</p>
           </div>
         ) : events.length === 0 ? (
           <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-2xl mb-4">
-              <Calendar className="w-8 h-8 text-gray-400" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 rounded-2xl mb-4">
+              <Calendar className="w-8 h-8 text-white" />
             </div>
-            <p className="text-gray-600 text-lg">Nenhum evento encontrado nesta categoria.</p>
+            <p className="text-white text-lg">Nenhum evento encontrado nesta categoria.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {events.map((event, index) => (
               <div
                 key={event.id}
-                className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100/80"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className={`group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 motion-reduce:transition-none border border-gray-100/80 reveal-on-scroll ${isInView ? 'visible' : ''}`}
+                style={{ transitionDelay: isInView ? `${index * 80}ms` : '0ms' }}
               >
                 <div className="relative h-56 overflow-hidden">
                   <div
-                    className="h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                    className="h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110 motion-reduce:group-hover:scale-100"
                     style={{
                       backgroundImage: event.image_url
                         ? `url(${event.image_url})`
@@ -170,7 +177,7 @@ export default function EventsSection() {
                   </div>
                   
                   <div className="mt-6 pt-4 border-t border-gray-100">
-                    <button className="w-full bg-primary-600 text-white py-3 rounded-xl font-medium hover:bg-primary-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                    <button className="w-full bg-primary-600 text-white py-3 rounded-xl font-medium hover:bg-primary-700 transition-all duration-300 motion-reduce:transition-none transform hover:scale-[1.02] motion-reduce:hover:scale-100 shadow-lg hover:shadow-xl">
                       Saiba Mais
                     </button>
                   </div>
