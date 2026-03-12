@@ -1,22 +1,28 @@
 import { useState } from 'react';
-import { Calendar, BarChart3, LogOut, DollarSign, Users, Menu, X, ClipboardList } from 'lucide-react';
+import { Calendar, BarChart3, LogOut, DollarSign, Users, Menu, X, ClipboardList, Package, Building2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import Dashboard from './Dashboard';
 import EventManagement from './EventManagement';
 import FinancialManagement from './FinancialManagement';
 import SimulationManagement from './SimulationManagement';
 import GestaoEventos from './GestaoEventos';
+import EstoqueBar from './EstoqueBar';
 import UserManagement from './UserManagement';
+import SuppliersManagement from './SuppliersManagement';
 
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState('events');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { profile, signOut } = useAuth();
 
   const baseTabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     { id: 'events', label: 'Eventos', icon: <Calendar className="w-5 h-5" /> },
     { id: 'simulations', label: 'Simulações', icon: <DollarSign className="w-5 h-5" /> },
     { id: 'scenarios', label: 'Cenários', icon: <BarChart3 className="w-5 h-5" /> },
     { id: 'gestao-eventos', label: 'Gestão de Eventos', icon: <ClipboardList className="w-5 h-5" /> },
+    { id: 'suppliers', label: 'Fornecedores', icon: <Building2 className="w-5 h-5" /> },
+    { id: 'estoque-bar', label: 'Produtos & Vendas', icon: <Package className="w-5 h-5" /> },
   ];
 
   const tabs =
@@ -108,10 +114,13 @@ export default function AdminPanel() {
 
       {/* Conteúdo */}
       <main className="flex-1 w-full p-4 md:p-8 md:pt-8 md:ml-0">
+        {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'events' && <EventManagement />}
         {activeTab === 'simulations' && <SimulationManagement />}
         {activeTab === 'scenarios' && <FinancialManagement />}
         {activeTab === 'gestao-eventos' && <GestaoEventos />}
+        {activeTab === 'suppliers' && <SuppliersManagement />}
+        {activeTab === 'estoque-bar' && <EstoqueBar />}
         {activeTab === 'users' && profile?.role === 'root' && <UserManagement />}
       </main>
     </div>

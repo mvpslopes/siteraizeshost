@@ -4,19 +4,19 @@ import { useInView } from '../hooks/useInView';
 const benefits = [
   {
     icon: <Sparkles className="w-6 h-6" />,
-    text: 'Maior exposição da genética e do trabalho do haras',
+    text: 'Maior visibilidade para o trabalho de criação dos Haras',
   },
   {
     icon: <Shield className="w-6 h-6" />,
-    text: 'Fortalecimento da marca dentro do setor',
+    text: 'Fortalecimento da marca e do posicionamento dentro da raça',
   },
   {
     icon: <Users className="w-6 h-6" />,
-    text: 'Conexão com novos clientes e parceiros',
+    text: 'Ampliação do relacionamento com clientes e parceiros',
   },
   {
     icon: <Leaf className="w-6 h-6" />,
-    text: 'Participação em projetos que valorizam o agronegócio',
+    text: 'Participação em iniciativas que valorizam a raça e o desenvolvimento da criação',
   },
 ];
 
@@ -29,20 +29,22 @@ export default function ParaHarasSection() {
       <div className="absolute bottom-0 right-0 w-80 h-80 bg-primary-400/10 rounded-full translate-y-40 translate-x-40 pointer-events-none" aria-hidden />
       <div className="container mx-auto px-4 relative max-w-7xl">
         <div className={`max-w-4xl mx-auto text-center mb-14 reveal-on-scroll ${isInView ? 'visible' : ''}`}>
-          <span className="section-label !text-white font-semibold uppercase tracking-widest">Para haras</span>
+          <span className="section-label !text-white font-semibold uppercase tracking-widest">Para Haras</span>
           <h2 className="section-title !text-white">
-            <span className="block !text-white">Uma vitrine para genética,</span>
-            <span className="block !text-white">tradição e credibilidade</span>
+            <span className="block !text-white">Uma vitrine para criação,</span>
+            <span className="block !text-white">tradição e credibilidade.</span>
           </h2>
           <p className="section-lead mt-6 !text-white">
-            Os eventos organizados pela Raízes são pensados para oferecer aos haras um ambiente estruturado de valorização e visibilidade.
+            Os eventos organizados pela Raízes são pensados para oferecer aos Haras
+            <br />
+            um ambiente estruturado de valorização e visibilidade.
           </p>
-          <p className="!text-white mt-4">
+          <p className="font-garet text-base md:text-lg !text-white mt-4 font-medium">
             Participar de eventos bem planejados proporciona:
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto mb-12">
           {benefits.map((item, index) => (
             <div
               key={index}
@@ -58,7 +60,9 @@ export default function ParaHarasSection() {
         </div>
 
         <p className="text-center !text-white max-w-2xl mx-auto leading-relaxed">
-          Acreditamos que eventos bem organizados são uma importante ferramenta de crescimento para criadores e para o setor como um todo.
+          Acreditamos que eventos bem organizados são uma importante
+          <br />
+          ferramenta de crescimento para criadores e para o setor como um todo.
         </p>
       </div>
     </section>

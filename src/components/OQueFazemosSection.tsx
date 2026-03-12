@@ -4,8 +4,14 @@ import { useInView } from '../hooks/useInView';
 const items = [
   {
     icon: <Calendar className="w-8 h-8" />,
-    title: 'Planejamento e organização de eventos agropecuários',
-    description: 'Estruturação completa de exposições, encontros técnicos, eventos institucionais e projetos voltados ao setor.',
+    title: (
+      <>
+        Planejamento e organização
+        <br />
+        de eventos agropecuários
+      </>
+    ),
+    description: 'Planejamento e estruturação de copas, exposições, poeirões, encontros técnicos, eventos institucionais e outros projetos voltados ao setor agropecuário e equestre.',
   },
   {
     icon: <Handshake className="w-8 h-8" />,
@@ -14,13 +20,19 @@ const items = [
   },
   {
     icon: <Award className="w-8 h-8" />,
-    title: 'Posicionamento e visibilidade de marcas',
-    description: 'Criação de oportunidades para que haras e empresas fortaleçam sua presença no mercado.',
+    title: (
+      <>
+        Posicionamento e visibilidade
+        <br />
+        de marcas
+      </>
+    ),
+    description: 'Criação de oportunidades para que Haras e empresas fortaleçam sua presença no mercado.',
   },
   {
     icon: <Users className="w-8 h-8" />,
     title: 'Experiência para o público',
-    description: 'Eventos pensados para gerar conexão, networking e valorização da cultura do campo.',
+    description: 'Eventos planejados para promover conexão, networking e valorização da cultura do campo, criando experiências que podem ser vividas e compartilhadas por toda a família.',
   },
 ];
 
@@ -39,7 +51,7 @@ export default function OQueFazemosSection() {
           <p className="section-lead max-w-3xl mx-auto">
             A Raízes Eventos atua de forma estratégica na concepção e realização de eventos, oferecendo suporte completo desde o planejamento até a execução.
           </p>
-          <p className="text-gray-600 mt-4 font-medium">
+          <p className="font-garet text-base md:text-lg text-gray-600 mt-4 font-medium">
             Entre nossas principais áreas de atuação estão:
           </p>
         </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Calendar, FileText, Users, TrendingUp, DollarSign, AlertCircle, UserCheck, Truck } from 'lucide-react';
 import { api } from '../../lib/api';
+import type { Event } from '../../lib/supabase';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -17,24 +18,35 @@ export default function Dashboard() {
     totalSuppliers: 0,
     activeSuppliers: 0,
   });
+  const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
     fetchStats();
   }, []);
 
   async function fetchStats() {
-    const [events, assessments] = await Promise.all([
+    const [eventsList, assessments] = await Promise.all([
       api.getEvents(),
-      api.getViabilityAssessments()
+      api.getViabilityAssessments(),
     ]);
 
-    const upcomingEvents = events.filter(event => 
-      event.status === 'publicado' && 
-      new Date(event.event_date) > new Date()
+    const sortedEvents = [...eventsList].sort(
+      (a, b) =>
+        new Date(a.start_date || a.event_date).getTime() -
+        new Date(b.start_date || b.event_date).getTime()
     );
 
-    const highViability = assessments.filter(assessment => 
-      assessment.viability_level === 'alta'
+    setEvents(sortedEvents);
+
+    const upcomingEvents = eventsList.filter(event => {
+      const start = new Date(event.start_date || event.event_date);
+      const end = event.end_date ? new Date(event.end_date) : start;
+      const now = new Date();
+      return event.status === 'publicado' && end > now;
+    });
+
+    const highViability = assessments.filter(
+      assessment => assessment.viability_level === 'alta'
     );
 
     // Simular dados financeiros e de clientes/fornecedores baseados nos eventos
@@ -48,7 +60,7 @@ export default function Dashboard() {
     const activeSuppliers = 10;
 
     setStats({
-      totalEvents: events.length,
+      totalEvents: eventsList.length,
       upcomingEvents: upcomingEvents.length,
       totalAssessments: assessments.length,
       highViability: highViability.length,
@@ -66,7 +78,7 @@ export default function Dashboard() {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
-      currency: 'BRL'
+      currency: 'BRL',
     }).format(value);
   };
 
@@ -145,6 +157,31 @@ export default function Dashboard() {
     },
   ];
 
+  const formatDateRange = (event: Event) => {
+    const start = event.start_date || event.event_date;
+    const end = event.end_date;
+    if (!start) return '-';
+    const startDate = new Date(start);
+    if (!end) {
+      return startDate.toLocaleDateString('pt-BR');
+    }
+    const endDate = new Date(end);
+    const sameDay = startDate.toDateString() === endDate.toDateString();
+    if (sameDay) {
+      return startDate.toLocaleDateString('pt-BR');
+    }
+    return `${startDate.toLocaleDateString('pt-BR')} → ${endDate.toLocaleDateString('pt-BR')}`;
+  };
+
+  const typeLabels: Record<Event['type'], string> = {
+    exposicao: 'Exposição',
+    copa: 'Copa',
+    poerao: 'Poeirão',
+    feira: 'Feira',
+    live: 'Live',
+    leilao: 'Leilão',
+  };
+
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Dashboard</h1>
@@ -166,8 +203,10 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Bem-vindo ao Painel Administrativo</h2>
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">
+          Bem-vindo ao Painel Administrativo
+        </h2>
         <p className="text-gray-600 mb-4">
           Gerencie eventos, avalie a viabilidade de novos projetos e acompanhe o desempenho da
           Raízes Eventos.
@@ -198,6 +237,77 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Resumo por evento */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">Eventos cadastrados</h2>
+            <p className="text-sm text-gray-600">
+              Visão geral por evento, além dos indicadores acumulados.
+            </p>
+          </div>
+          <span className="text-xs px-3 py-1 rounded-full bg-primary-50 text-primary-700 font-medium">
+            {events.length} evento(s)
+          </span>
+        </div>
+
+        {events.length === 0 ? (
+          <p className="text-sm text-gray-500">Nenhum evento cadastrado ainda.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">Evento</th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">Tipo</th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">Período</th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {events.map(ev => (
+                  <tr key={ev.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2">
+                      <p className="font-semibold text-gray-900">{ev.name}</p>
+                      {ev.location && (
+                        <p className="text-xs text-gray-500">{ev.location}</p>
+                      )}
+                    </td>
+                    <td className="px-4 py-2">
+                      <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-700">
+                        {typeLabels[ev.type]}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-gray-700">{formatDateRange(ev)}</td>
+                    <td className="px-4 py-2">
+                      <span
+                        className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
+                          ev.status === 'publicado'
+                            ? 'bg-green-50 text-green-700'
+                            : ev.status === 'concluido'
+                            ? 'bg-blue-50 text-blue-700'
+                            : ev.status === 'cancelado'
+                            ? 'bg-red-50 text-red-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {ev.status === 'rascunho'
+                          ? 'Rascunho'
+                          : ev.status === 'publicado'
+                          ? 'Publicado'
+                          : ev.status === 'concluido'
+                          ? 'Concluído'
+                          : 'Cancelado'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

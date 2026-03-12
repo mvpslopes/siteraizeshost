@@ -66,7 +66,13 @@ export default function ViabilityAssessmentComponent() {
   async function fetchEvents() {
     try {
       const data = await api.getEvents();
-      setEvents(data.sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()));
+      setEvents(
+        data.sort(
+          (a, b) =>
+            new Date(b.start_date || b.event_date).getTime() -
+            new Date(a.start_date || a.event_date).getTime()
+        )
+      );
     } catch (error) {
       console.error('Erro ao carregar eventos:', error);
     }
@@ -150,7 +156,7 @@ export default function ViabilityAssessmentComponent() {
           <option value="">Selecione um evento...</option>
           {events.map((event) => (
             <option key={event.id} value={event.id}>
-              {event.name} - {new Date(event.event_date).toLocaleDateString('pt-BR')}
+              {event.name} - {new Date(event.start_date || event.event_date).toLocaleDateString('pt-BR')}
             </option>
           ))}
         </select>

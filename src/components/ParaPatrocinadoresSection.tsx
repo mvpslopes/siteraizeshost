@@ -35,7 +35,7 @@ export default function ParaPatrocinadoresSection() {
           <p className="section-lead mt-6">
             Os eventos da Raízes oferecem oportunidades estratégicas para empresas que desejam fortalecer sua presença no agronegócio.
           </p>
-          <p className="text-gray-600 mt-4">
+          <p className="font-garet text-base md:text-lg text-gray-600 mt-4 font-medium">
             Através de projetos estruturados de patrocínio, proporcionamos:
           </p>
         </div>

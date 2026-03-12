@@ -74,6 +74,9 @@ export default {
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
         'serif': ['Georgia', 'serif'],
+        'code': ['"Source Code Pro"', 'ui-monospace', 'monospace'],
+        'garet': ['Garet', 'system-ui', 'sans-serif'],
+        'blacksword': ['Blacksword', 'Georgia', 'serif'],
       },
     },
   },

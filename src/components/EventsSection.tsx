@@ -18,18 +18,24 @@ export default function EventsSection() {
     setLoading(true);
     try {
       const data = await api.getEvents();
-      let filteredEvents = data.filter(event => 
-        event.status === 'publicado' && 
-        new Date(event.event_date) >= new Date()
-      );
+      let filteredEvents = data.filter(event => {
+        const start = new Date(event.start_date || event.event_date);
+        const end = event.end_date ? new Date(event.end_date) : start;
+        const now = new Date();
+        return event.status === 'publicado' && end >= now;
+      });
 
       if (filter !== 'todos') {
         filteredEvents = filteredEvents.filter(event => event.type === filter);
       }
 
-      setEvents(filteredEvents.sort((a, b) => 
-        new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
-      ));
+      setEvents(
+        filteredEvents.sort(
+          (a, b) =>
+            new Date(a.start_date || a.event_date).getTime() -
+            new Date(b.start_date || b.event_date).getTime()
+        )
+      );
     } catch (error) {
       console.error('Erro ao carregar eventos:', error);
     }
@@ -39,12 +45,14 @@ export default function EventsSection() {
   const eventTypes = [
     { value: 'todos', label: 'Todos' },
     { value: 'exposicao', label: 'Exposições' },
+    { value: 'copa', label: 'Copas' },
+    { value: 'poerao', label: 'Poeirões' },
     { value: 'feira', label: 'Feiras' },
+    { value: 'live', label: 'Lives' },
     { value: 'leilao', label: 'Leilões' },
-    { value: 'cavalgada', label: 'Cavalgadas' },
   ];
 
-  const formatDate = (dateString: string) => {
+  const formatDateTime = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: 'long',
@@ -54,12 +62,38 @@ export default function EventsSection() {
     });
   };
 
+  const formatEventPeriod = (event: Event) => {
+    const start = event.start_date || event.event_date;
+    const end = event.end_date;
+    if (!start) return '-';
+    if (!end || start.slice(0, 10) === end.slice(0, 10)) {
+      return formatDateTime(start);
+    }
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const sameMonth =
+      startDate.getMonth() === endDate.getMonth() &&
+      startDate.getFullYear() === endDate.getFullYear();
+    const startStr = startDate.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: sameMonth ? undefined : 'short',
+    });
+    const endStr = endDate.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+    return `${startStr} a ${endStr}`;
+  };
+
   const getTypeLabel = (type: EventType) => {
     const labels = {
       exposicao: 'Exposição',
+      copa: 'Copa',
+      poerao: 'Poeirão',
       feira: 'Feira',
+      live: 'Live',
       leilao: 'Leilão',
-      cavalgada: 'Cavalgada',
     };
     return labels[type];
   };
@@ -158,7 +192,7 @@ export default function EventsSection() {
                       <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mr-3">
                         <Calendar className="w-4 h-4 text-primary-600" />
                       </div>
-                      <span className="font-medium">{formatDate(event.event_date)}</span>
+                      <span className="font-medium">{formatEventPeriod(event)}</span>
                     </div>
                     
                     <div className="flex items-center text-sm text-gray-600">

@@ -8,7 +8,6 @@ import AboutSection from './components/AboutSection';
 import OQueFazemosSection from './components/OQueFazemosSection';
 import ParaHarasSection from './components/ParaHarasSection';
 import ParaPatrocinadoresSection from './components/ParaPatrocinadoresSection';
-import EventsSection from './components/EventsSection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 import WhatsAppFloat from './components/WhatsAppFloat';
@@ -74,7 +73,6 @@ function AppContent() {
         <OQueFazemosSection />
         <ParaHarasSection />
         <ParaPatrocinadoresSection />
-        <EventsSection />
         <ContactSection />
       </main>
       <Footer />

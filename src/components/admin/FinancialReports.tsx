@@ -50,7 +50,13 @@ export default function FinancialReports() {
   async function fetchEvents() {
     try {
       const data = await api.getEvents();
-      setEvents(data.sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()));
+      setEvents(
+        data.sort(
+          (a, b) =>
+            new Date(b.start_date || b.event_date).getTime() -
+            new Date(a.start_date || a.event_date).getTime()
+        )
+      );
     } catch (error) {
       console.error('Erro ao carregar eventos:', error);
     }
@@ -163,7 +169,7 @@ export default function FinancialReports() {
               <option value="">Selecione um evento...</option>
               {events.map((event) => (
                 <option key={event.id} value={event.id}>
-                  {event.name} - {formatDate(event.event_date)}
+                  {event.name} - {formatDate(event.start_date || event.event_date)}
                 </option>
               ))}
             </select>

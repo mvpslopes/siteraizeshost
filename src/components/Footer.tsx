@@ -38,9 +38,8 @@ export default function Footer() {
                 { href: '#inicio', label: 'Início' },
                 { href: '#sobre', label: 'Sobre' },
                 { href: '#o-que-fazemos', label: 'O que fazemos' },
-                { href: '#para-haras', label: 'Para haras' },
+                { href: '#para-haras', label: 'Para Haras' },
                 { href: '#para-patrocinadores', label: 'Para patrocinadores' },
-                { href: '#eventos', label: 'Eventos' },
                 { href: '#contato', label: 'Contato' },
               ].map((link) => (
                 <li key={link.href}>

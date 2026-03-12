@@ -16,7 +16,8 @@ export default function EventManagement() {
     type: 'exposicao' as EventType,
     description: '',
     location: '',
-    event_date: '',
+    start_date: '',
+    end_date: '',
     responsible_name: '',
     responsible_contact: '',
     image_url: '',
@@ -31,7 +32,13 @@ export default function EventManagement() {
   async function fetchEvents() {
     try {
       const data = await api.getEvents();
-      setEvents(data.sort((a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()));
+      setEvents(
+        data.sort(
+          (a, b) =>
+            new Date(b.start_date || b.event_date).getTime() -
+            new Date(a.start_date || a.event_date).getTime()
+        )
+      );
     } catch (error) {
       console.error('Erro ao carregar eventos:', error);
     }
@@ -42,11 +49,15 @@ export default function EventManagement() {
     e.preventDefault();
 
     try {
+      const payload = {
+        ...formData,
+        event_date: formData.start_date || '',
+      };
       if (editingEvent) {
-        await api.updateEvent(editingEvent.id, formData);
+        await api.updateEvent(editingEvent.id, payload);
       } else {
         await api.createEvent({
-          ...formData,
+          ...payload,
           created_by: user?.id || '1',
         });
       }
@@ -64,7 +75,8 @@ export default function EventManagement() {
       type: event.type,
       description: event.description,
       location: event.location,
-      event_date: event.event_date.slice(0, 16),
+      start_date: (event.start_date || event.event_date).slice(0, 16),
+      end_date: event.end_date ? event.end_date.slice(0, 16) : '',
       responsible_name: event.responsible_name,
       responsible_contact: event.responsible_contact,
       image_url: event.image_url,
@@ -91,7 +103,8 @@ export default function EventManagement() {
       type: 'exposicao',
       description: '',
       location: '',
-      event_date: '',
+      start_date: '',
+      end_date: '',
       responsible_name: '',
       responsible_contact: '',
       image_url: '',
@@ -176,9 +189,11 @@ export default function EventManagement() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700"
                   >
                     <option value="exposicao">Exposição</option>
+                    <option value="copa">Copa</option>
+                    <option value="poerao">Poeirão</option>
                     <option value="feira">Feira</option>
+                    <option value="live">Live</option>
                     <option value="leilao">Leilão</option>
-                    <option value="cavalgada">Cavalgada</option>
                   </select>
                 </div>
                 <div>
@@ -207,12 +222,21 @@ export default function EventManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2">Data e Hora</label>
+                  <label className="block text-gray-700 font-medium mb-2">Início</label>
                   <input
                     type="datetime-local"
                     required
-                    value={formData.event_date}
-                    onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">Término</label>
+                  <input
+                    type="datetime-local"
+                    value={formData.end_date}
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-700"
                   />
                 </div>
@@ -298,7 +322,7 @@ export default function EventManagement() {
                   Nome do Evento
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Data
+                  Período
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Local
@@ -323,7 +347,14 @@ export default function EventManagement() {
                   <td className="px-6 py-4 text-sm text-gray-600">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      {new Date(event.event_date).toLocaleDateString('pt-BR')}
+                      {new Date(event.start_date || event.event_date).toLocaleDateString('pt-BR')}
+                      {event.end_date && (
+                        <>
+                          {' '}
+                          -{' '}
+                          {new Date(event.end_date).toLocaleDateString('pt-BR')}
+                        </>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">

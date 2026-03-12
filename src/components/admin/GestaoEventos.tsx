@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { ClipboardList, DollarSign, Save, AlertCircle, Clock, TrendingUp, Wallet } from 'lucide-react';
+import jsPDF from 'jspdf';
+import * as XLSX from 'xlsx';
 import { Event, EventFinancialItem, EventScenario, PaymentStatus } from '../../lib/supabase';
 import { api, type ScenarioItemRow } from '../../lib/api';
 
@@ -24,13 +25,18 @@ export default function GestaoEventos() {
   const [savingId, setSavingId] = useState<string | null>(null);
 
   useEffect(() => {
-    api.getEvents().then(data => {
-      setEvents(
-        data.sort(
-          (a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
-        )
-      );
-    }).catch(console.error).finally(() => setLoading(false));
+    api.getEvents()
+      .then(data => {
+        setEvents(
+          data.sort(
+            (a, b) =>
+              new Date(b.start_date || b.event_date).getTime() -
+              new Date(a.start_date || a.event_date).getTime()
+          )
+        );
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -40,13 +46,25 @@ export default function GestaoEventos() {
       setScenarioItems([]);
       return;
     }
-    if (!selectedEvent.chosen_scenario_id) {
+
+    const scenarioId = selectedEvent.chosen_scenario_id;
+
+    if (!scenarioId) {
       setChosenScenario(null);
-      setItems([]);
       setScenarioItems([]);
+      api
+        .getEventFinancialItems(selectedEvent.id)
+        .then(financialItems => {
+          const merged: ItemWithExpected[] = financialItems.map(item => ({
+            ...item,
+            expected_amount: item.base_amount ?? 0,
+          }));
+          setItems(merged);
+        })
+        .catch(console.error);
       return;
     }
-    const scenarioId = selectedEvent.chosen_scenario_id;
+
     Promise.all([
       api.getEventScenarios(selectedEvent.id),
       api.getEventFinancialItems(selectedEvent.id),
@@ -152,6 +170,222 @@ export default function GestaoEventos() {
     };
   }, [items]);
 
+  const buildTableRows = () =>
+    items.map(item => ({
+      item: item.name,
+      tipo: item.type === 'receita' ? 'Receita' : 'Custo',
+      valorPrevisto: formatCurrency(item.expected_amount),
+      status:
+        PAYMENT_STATUS_OPTIONS.find(opt => opt.value === item.payment_status)?.label ??
+        item.payment_status,
+      vencimento: item.due_date ? new Date(item.due_date).toLocaleDateString('pt-BR') : '-',
+      pagamento: item.payment_date ? new Date(item.payment_date).toLocaleDateString('pt-BR') : '-',
+    }));
+
+  const handleExportExcel = () => {
+    if (!selectedEvent) {
+      alert('Selecione um evento para exportar.');
+      return;
+    }
+    const rows = buildTableRows();
+
+    const worksheetData = [
+      [
+        'Item',
+        'Tipo',
+        'Valor previsto',
+        'Status',
+        'Vencimento',
+        'Data pagamento',
+      ],
+      ...rows.map(row => [
+        row.item,
+        row.tipo,
+        row.valorPrevisto,
+        row.status,
+        row.vencimento,
+        row.pagamento,
+      ]),
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Gestão de Eventos');
+
+    const fileName = `gestao-evento-${selectedEvent.name
+      .replace(/\s+/g, '-')
+      .toLowerCase()}.xlsx`;
+
+    XLSX.writeFile(workbook, fileName);
+  };
+
+  const handleExportPDF = () => {
+    if (!selectedEvent) {
+      alert('Selecione um evento para exportar.');
+      return;
+    }
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    const primary600 = [109, 122, 68]; // #6d7a44
+    const primary800 = [69, 77, 47]; // #454d2f
+    const secondary400 = [242, 147, 51]; // #f29333
+    const neutralBackground = [245, 245, 244];
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const marginX = 16;
+
+    doc.setFillColor(neutralBackground[0], neutralBackground[1], neutralBackground[2]);
+    doc.rect(0, 0, pageWidth, doc.internal.pageSize.getHeight(), 'F');
+
+    doc.setFillColor(primary600[0], primary600[1], primary600[2]);
+    doc.rect(0, 0, pageWidth, 42, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text('Gestão de Eventos', marginX, 20);
+
+    doc.setDrawColor(secondary400[0], secondary400[1], secondary400[2]);
+    doc.setLineWidth(0.7);
+    doc.line(marginX, 26, pageWidth - marginX, 26);
+
+    doc.setFontSize(11);
+    const eventName = selectedEvent.name;
+    const eventDate = selectedEvent.start_date
+      ? new Date(selectedEvent.start_date).toLocaleDateString('pt-BR')
+      : selectedEvent.event_date
+      ? new Date(selectedEvent.event_date).toLocaleDateString('pt-BR')
+      : '';
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Evento: ${eventName}`, marginX, 32);
+    if (eventDate) {
+      doc.text(`Data: ${eventDate}`, marginX, 38);
+    }
+
+    const cardX = marginX;
+    const cardY = 50;
+    const cardW = pageWidth - marginX * 2;
+    const cardH = 34;
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(secondary400[0], secondary400[1], secondary400[2]);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(cardX, cardY, cardW, cardH, 3, 3, 'FD');
+
+    doc.setTextColor(secondary400[0], secondary400[1], secondary400[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Resumo financeiro do cenário', cardX + 4, cardY + 7);
+
+    doc.setTextColor(60, 60, 60);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    const resumoLeft = [
+      `Saldo previsto: ${formatCurrency(dashboard.saldoPrevisto)}`,
+      `Total receitas: ${formatCurrency(dashboard.totalReceitas)}`,
+      `Total despesas: ${formatCurrency(dashboard.totalDespesas)}`,
+    ];
+    const resumoRight = [
+      `Saldo realizado: ${formatCurrency(dashboard.saldoRealizado)}`,
+      `Pendências: ${dashboard.pendentes.count} itens (${formatCurrency(
+        dashboard.pendentes.valor
+      )})`,
+      `Atrasados: ${dashboard.atrasados.count} itens (${formatCurrency(
+        dashboard.atrasados.valor
+      )})`,
+    ];
+    resumoLeft.forEach((line, index) => {
+      doc.text(line, cardX + 4, cardY + 13 + index * 4.5);
+    });
+    resumoRight.forEach((line, index) => {
+      doc.text(
+        line,
+        cardX + cardW / 2,
+        cardY + 13 + index * 4.5
+      );
+    });
+
+    const startTableY = cardY + cardH + 14;
+    const rows = buildTableRows();
+    const colHeaders = ['Item', 'Tipo', 'Valor previsto', 'Status', 'Venc.', 'Pgto.'];
+    const colWidths = [76, 22, 30, 30, 22, 22];
+
+    let currentY = startTableY;
+
+    doc.setFillColor(primary800[0], primary800[1], primary800[2]);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    let x = cardX;
+    const headerHeight = 7;
+    colHeaders.forEach((header, idx) => {
+      const w = colWidths[idx];
+      doc.rect(x, currentY, w, headerHeight, 'F');
+      doc.text(header, x + 2, currentY + 4.5);
+      x += w;
+    });
+    currentY += headerHeight;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(40, 40, 40);
+    const rowHeight = 7;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const bottomMargin = 20;
+
+    rows.forEach((row, rowIndex) => {
+      if (currentY + rowHeight > pageHeight - bottomMargin) {
+        doc.addPage();
+        doc.setFillColor(neutralBackground[0], neutralBackground[1], neutralBackground[2]);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+        currentY = 24;
+
+        doc.setFillColor(primary800[0], primary800[1], primary800[2]);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        let headerX = cardX;
+        colHeaders.forEach((header, idx) => {
+          const w = colWidths[idx];
+          doc.rect(headerX, currentY, w, headerHeight, 'F');
+          doc.text(header, headerX + 2, currentY + 4.5);
+          headerX += w;
+        });
+        currentY += headerHeight;
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(40, 40, 40);
+      }
+
+      const isStriped = rowIndex % 2 === 0;
+      let rowX = cardX;
+      if (isStriped) {
+        doc.setFillColor(248, 248, 248);
+        doc.rect(rowX, currentY, colWidths.reduce((a, b) => a + b, 0), rowHeight, 'F');
+      }
+
+      const values = [
+        row.item,
+        row.tipo,
+        row.valorPrevisto,
+        row.status,
+        row.vencimento,
+        row.pagamento,
+      ];
+      values.forEach((value, idx) => {
+        const w = colWidths[idx];
+        const textX = rowX + 2;
+        const textY = currentY + 4;
+        doc.text(String(value), textX, textY, { maxWidth: w - 4 });
+        rowX += w;
+      });
+
+      currentY += rowHeight;
+    });
+
+    doc.save(
+      `gestao-evento-${selectedEvent.name.replace(/\s+/g, '-').toLowerCase()}.pdf`
+    );
+  };
+
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -165,6 +399,24 @@ export default function GestaoEventos() {
       <div className="flex items-center space-x-3 mb-8">
         <ClipboardList className="w-8 h-8 text-primary-600" />
         <h1 className="text-3xl font-bold text-gray-800">Gestão de Eventos</h1>
+        {selectedEvent && items.length > 0 && (
+          <div className="ml-auto flex gap-3">
+            <button
+              type="button"
+              onClick={handleExportExcel}
+              className="px-4 py-2 rounded-lg border border-primary-200 text-primary-700 text-sm font-medium hover:bg-primary-50 transition-colors"
+            >
+              Exportar Excel
+            </button>
+            <button
+              type="button"
+              onClick={handleExportPDF}
+              className="px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 shadow-sm transition-colors"
+            >
+              Exportar PDF
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -188,24 +440,21 @@ export default function GestaoEventos() {
         </select>
       </div>
 
-      {selectedEvent && !selectedEvent.chosen_scenario_id && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-amber-800">
-          <p className="font-medium mb-1">Nenhum cenário aplicado a este evento</p>
-          <p className="text-sm">
-            Vá em <strong>Cenários</strong>, selecione este evento, escolha um cenário e
-            clique em <strong>Usar como evento cadastrado</strong> (ícone de prancheta).
-            Depois volte aqui para gerenciar pagamentos e datas.
-          </p>
-        </div>
-      )}
-
-      {selectedEvent && selectedEvent.chosen_scenario_id && chosenScenario && (
+      {selectedEvent && (
         <>
-          <div className="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center gap-4 flex-wrap">
-            <span className="text-gray-600">
-              Cenário em uso: <strong>{chosenScenario.name}</strong> ({chosenScenario.code})
-            </span>
-          </div>
+          {chosenScenario ? (
+            <div className="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center gap-4 flex-wrap">
+              <span className="text-gray-600">
+                Cenário em uso: <strong>{chosenScenario.name}</strong> ({chosenScenario.code})
+              </span>
+            </div>
+          ) : (
+            <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-4 flex items-center gap-4 flex-wrap">
+              <span className="text-primary-800 text-sm">
+                <strong>Gestão direta</strong> — sem cenário. Você pode gerenciar pagamentos e datas dos itens cadastrados em Simulações. Opcionalmente, use <strong>Cenários</strong> para planejar mais de uma previsão e aplicar uma ao evento.
+              </span>
+            </div>
+          )}
 
           {/* Dashboard geral */}
           <section className="mb-8">
@@ -316,7 +565,7 @@ export default function GestaoEventos() {
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <h2 className="text-lg font-semibold text-gray-800 p-4 border-b border-gray-200 flex items-center gap-2">
               <DollarSign className="w-5 h-5 text-primary-600" />
-              Itens do cenário – pagamentos e datas
+              Itens – pagamentos e datas
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full">

@@ -1,3 +1,56 @@
+/* Fontes da cliente: Code Pro (Source Code Pro), Garet, Blacksword */
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url('../font/SourceCodePro-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url('../font/SourceCodePro-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url('../font/SourceCodePro-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url('../font/SourceCodePro-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Garet';
+  src: url('../font/Garet-Book.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Garet';
+  src: url('../font/Garet-Heavy.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Blacksword';
+  src: url('../font/Blacksword.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -155,18 +208,18 @@
   }
 }
 
-/* Padrão de título de seção para harmonia */
+/* Padrão de título de seção para harmonia (Garet para teste) */
 .section-label {
-  @apply text-xs font-semibold uppercase tracking-widest text-primary-600 mb-3 block;
+  @apply text-xs font-semibold uppercase tracking-widest text-primary-600 mb-3 block font-code;
 }
 .section-title {
-  @apply text-4xl md:text-5xl font-bold tracking-tight text-gray-800 mb-4;
+  @apply text-4xl md:text-5xl font-bold tracking-tight text-gray-800 mb-4 font-garet;
 }
 .section-title-accent {
   @apply text-primary-600;
 }
 .section-lead {
-  @apply text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto;
+  @apply text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto font-garet;
 }
 
 @layer components {

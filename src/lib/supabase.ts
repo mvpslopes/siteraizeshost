@@ -24,7 +24,7 @@ export const supabase = supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
 
-export type EventType = 'exposicao' | 'feira' | 'leilao' | 'cavalgada';
+export type EventType = 'exposicao' | 'copa' | 'poerao' | 'feira' | 'live' | 'leilao';
 export type EventStatus = 'rascunho' | 'publicado' | 'concluido' | 'cancelado';
 export type UserRole = 'admin' | 'colaborador' | 'avaliador';
 export type ViabilityLevel = 'baixa' | 'media' | 'alta';
@@ -37,6 +37,11 @@ export interface Event {
   type: EventType;
   description: string;
   location: string;
+  /** Data e hora de início do evento */
+  start_date: string;
+  /** Data e hora de término do evento */
+  end_date: string;
+  /** Campo legado mantido para compatibilidade; use start_date/end_date no restante do sistema */
   event_date: string;
   responsible_name: string;
   responsible_contact: string;
@@ -175,7 +180,15 @@ export interface FinancialReport {
 }
 
 export type ClientType = 'pessoa_fisica' | 'pessoa_juridica';
-export type SupplierCategory = 'infraestrutura' | 'alimentacao' | 'equipamentos' | 'marketing' | 'transporte' | 'seguranca' | 'limpeza' | 'outros';
+export type SupplierCategory =
+  | 'infraestrutura'
+  | 'alimentacao'
+  | 'equipamentos'
+  | 'marketing'
+  | 'transporte'
+  | 'seguranca'
+  | 'limpeza'
+  | 'outros';
 export type ContactType = 'telefone' | 'email' | 'whatsapp' | 'site';
 
 export interface Contact {
@@ -212,32 +225,73 @@ export interface Client {
   updated_at: string;
 }
 
+/**
+ * Cadastro geral de fornecedores (fora do contexto de um evento específico).
+ * A tabela no backend pode ser mais simples; os campos extras são opcionais.
+ */
 export interface Supplier {
   id: string;
+  /** Nome curto para exibição (FORNECEDOR) */
   name: string;
-  document: string; // CNPJ
-  email: string;
-  phone: string;
-  category: SupplierCategory;
-  address: {
-    street: string;
-    number: string;
-    complement?: string;
-    neighborhood: string;
-    city: string;
-    state: string;
-    zipCode: string;
-  };
-  contacts: Contact[];
-  services: string[];
-  payment_terms: string;
-  rating: number; // 1-5 estrelas
+  /** Categoria do fornecedor: CREPE, AÇAÍ, HAMBURGUER, etc. */
+  category?: SupplierCategory | string;
+  /** CNPJ ou CPF */
+  document?: string;
+  /** Razão Social ou Nome fantasia completo */
+  legal_name?: string;
+  /** Endereço completo em uma string */
+  address?: string;
+  /** Nome do responsável de contato */
+  responsible_name?: string;
+  email?: string;
+  phone?: string;
+  /** Conta / dados de depósito, transferência ou PIX */
+  bank_info?: string;
+  /** Observações gerais adicionais */
   notes?: string;
-  total_contracts: number;
-  total_value: number;
-  last_contract_date?: string;
-  status: 'ativo' | 'inativo' | 'suspenso';
-  created_by: string;
+  status?: 'ativo' | 'inativo' | 'suspenso';
+  created_at?: string;
+  updated_at?: string;
+}
+
+/** Categorias do bar */
+export type BarItemCategory = 'bebidas' | 'comidas' | 'outros';
+
+/** Unidade de medida do item do bar */
+export type BarItemUnit = 'un' | 'cx' | 'garrafa' | 'litro' | 'dose' | 'outro';
+
+/** Item do bar (cadastro + estoque) por evento */
+export interface EventBarItem {
+  id: string;
+  event_id: string;
+  /** Fornecedor responsável por este item no evento (opcional para manter compatibilidade com dados antigos) */
+  supplier_id?: string | null;
+  /** Nome do fornecedor já resolvido pelo backend (join) para exibição rápida */
+  supplier_name?: string | null;
+  name: string;
+  description: string;
+  category: BarItemCategory;
+  unit: BarItemUnit;
+  quantity_stock: number;
+  unit_price: number;
+  unit_cost: number | null;
+  quantity_sold: number;
+  min_stock: number | null;
+  closed_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** Lançamento de venda do bar (uma venda = um registro; dá baixa no estoque) */
+export interface EventBarSale {
+  id: string;
+  event_id: string;
+  bar_item_id: string;
+  quantity: number;
+  unit_price: number;
+  total: number;
+  sold_at: string;
+  created_at: string;
+  item_name?: string;
+  item_unit?: string;
 }

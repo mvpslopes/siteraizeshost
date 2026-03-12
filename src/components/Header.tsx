@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Logo from './Logo';
 
-const SECTION_IDS = ['sobre', 'o-que-fazemos', 'para-haras', 'para-patrocinadores', 'eventos', 'contato'];
+const SECTION_IDS = ['sobre', 'o-que-fazemos', 'para-haras', 'para-patrocinadores', 'contato'];
 
 interface HeaderProps {
   onNavigate: (section: string) => void;
@@ -59,9 +59,8 @@ export default function Header({ onNavigate }: HeaderProps) {
     { id: 'inicio', label: 'Início' },
     { id: 'sobre', label: 'Sobre' },
     { id: 'o-que-fazemos', label: 'O que fazemos' },
-    { id: 'para-haras', label: 'Para haras' },
+    { id: 'para-haras', label: 'Para Haras' },
     { id: 'para-patrocinadores', label: 'Para patrocinadores' },
-    { id: 'eventos', label: 'Eventos' },
     { id: 'contato', label: 'Contato' },
   ];
 

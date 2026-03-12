@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, MapPin, Instagram, MessageCircle } from 'lucide-react';
+import { Mail, Instagram, MessageCircle } from 'lucide-react';
 import { useInView } from '../hooks/useInView';
 import { formatPhone } from '../utils/formatPhone';
 
@@ -38,7 +38,9 @@ export default function ContactSection() {
             <span className="block section-title-accent">o próximo evento</span>
           </h2>
           <p className="section-lead">
-            Se você representa um haras, empresa ou deseja desenvolver um projeto no setor, entre em contato conosco.
+            Se você representa um Haras, empresa ou deseja
+            <br />
+            desenvolver um projeto no setor, entre em contato conosco.
           </p>
         </div>
 
@@ -127,16 +129,6 @@ export default function ContactSection() {
                       <a href={`https://wa.me/553195499897?text=${encodeURIComponent(WHATSAPP_MENSAGEM_PADRAO)}`} target="_blank" rel="noopener noreferrer" className="block text-primary-600 hover:text-primary-700 font-medium transition-colors">Léo Barbosa — {formatPhone('553195499897')}</a>
                       <a href={`https://wa.me/553196392292?text=${encodeURIComponent(WHATSAPP_MENSAGEM_PADRAO)}`} target="_blank" rel="noopener noreferrer" className="block text-primary-600 hover:text-primary-700 font-medium transition-colors">Thatyane Hoelzle — {formatPhone('553196392292')}</a>
                     </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-start group">
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform duration-300 motion-reduce:group-hover:scale-100">
-                    <MapPin className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-800 text-lg mb-2">Localização</h4>
-                    <p className="text-gray-600">Minas Gerais</p>
                   </div>
                 </div>
                 

@@ -7,6 +7,8 @@ type ItemFormState = {
   type: FinancialType;
   name: string;
   description: string;
+  quantity: number;
+  unitAmount: number;
   amount: number;
 };
 
@@ -22,6 +24,8 @@ export default function SimulationManagement() {
     type: 'receita',
     name: '',
     description: '',
+    quantity: 1,
+    unitAmount: 0,
     amount: 0,
   });
 
@@ -42,7 +46,9 @@ export default function SimulationManagement() {
       const data = await api.getEvents();
       setEvents(
         data.sort(
-          (a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
+          (a, b) =>
+            new Date(b.start_date || b.event_date).getTime() -
+            new Date(a.start_date || a.event_date).getTime()
         )
       );
     } catch (error) {
@@ -71,6 +77,8 @@ export default function SimulationManagement() {
       type,
       name: '',
       description: '',
+      quantity: 1,
+      unitAmount: 0,
       amount: 0,
     });
     setShowForm(true);
@@ -78,11 +86,14 @@ export default function SimulationManagement() {
 
   const handleEditItem = (item: EventFinancialItem) => {
     setEditingItem(item);
+    const base = item.base_amount || 0;
     setForm({
       type: item.type,
       name: item.name,
       description: item.description,
-      amount: item.base_amount || 0,
+      quantity: 1,
+      unitAmount: base,
+      amount: base,
     });
     setShowForm(true);
   };
@@ -100,7 +111,9 @@ export default function SimulationManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedEvent) return;
-    if (!form.name || form.amount <= 0) return;
+    if (!form.name || form.quantity <= 0 || form.unitAmount <= 0) return;
+
+    const total = form.quantity * form.unitAmount;
 
     const payloadBase: Omit<EventFinancialItem, 'id'> = {
       event_id: selectedEvent.id,
@@ -109,7 +122,7 @@ export default function SimulationManagement() {
       name: form.name,
       description: form.description,
       category: undefined,
-      base_amount: form.amount,
+      base_amount: total,
       percentage_over_revenue: undefined,
       payment_status: 'previsto',
       due_date: undefined,
@@ -139,6 +152,8 @@ export default function SimulationManagement() {
       type: 'receita',
       name: '',
       description: '',
+      quantity: 1,
+      unitAmount: 0,
       amount: 0,
     });
   };
@@ -187,7 +202,7 @@ export default function SimulationManagement() {
           <option value="">Selecione um evento...</option>
           {events.map(event => (
             <option key={event.id} value={event.id}>
-              {event.name} - {formatDate(event.event_date)}
+              {event.name} - {formatDate(event.start_date || event.event_date)}
             </option>
           ))}
         </select>
@@ -389,21 +404,58 @@ export default function SimulationManagement() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Valor (R$)
+                  Quantidade
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={form.quantity}
+                  onChange={e =>
+                    setForm(prev => ({
+                      ...prev,
+                      quantity: parseInt(e.target.value || '1', 10) || 1,
+                      amount: (parseInt(e.target.value || '1', 10) || 1) * prev.unitAmount,
+                    }))
+                  }
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Valor unitário (R$)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.unitAmount}
+                  onChange={e =>
+                    setForm(prev => {
+                      const unit = parseFloat(e.target.value) || 0;
+                      return {
+                        ...prev,
+                        unitAmount: unit,
+                        amount: unit * prev.quantity,
+                      };
+                    })
+                  }
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Valor total (R$)
                 </label>
                 <input
                   type="number"
                   min="0"
                   step="0.01"
                   value={form.amount}
-                  onChange={e =>
-                    setForm(prev => ({
-                      ...prev,
-                      amount: parseFloat(e.target.value) || 0,
-                    }))
-                  }
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700"
                 />
               </div>
               <div className="flex justify-end space-x-3 pt-2">
