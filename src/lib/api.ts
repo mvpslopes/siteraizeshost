@@ -13,6 +13,10 @@ import type {
   ViabilityAssessment,
   ContactMessage,
   Supplier,
+  SatisfactionSurvey,
+  SurveyQuestion,
+  SurveyResults,
+  SurveyAnswer,
 } from './supabase';
 
 export interface ScenarioItemRow {
@@ -134,6 +138,42 @@ function toBarSale(row: Record<string, unknown>): EventBarSale {
     created_at: String(row.created_at ?? ''),
     item_name: row.item_name != null ? String(row.item_name) : undefined,
     item_unit: row.item_unit != null ? String(row.item_unit) : undefined,
+  };
+}
+
+function toSurvey(row: Record<string, unknown>): SatisfactionSurvey {
+  return {
+    id: String(row.id),
+    event_id: String(row.event_id ?? ''),
+    event_name: row.event_name != null ? String(row.event_name) : undefined,
+    title: String(row.title ?? ''),
+    description: row.description != null ? String(row.description) : undefined,
+    slug: String(row.slug ?? ''),
+    hero_image_url: row.hero_image_url != null ? String(row.hero_image_url) : undefined,
+    status: (row.status as SatisfactionSurvey['status']) ?? 'rascunho',
+    response_count: row.response_count != null ? Number(row.response_count) : 0,
+    created_by: row.created_by != null ? String(row.created_by) : undefined,
+    created_at: String(row.created_at ?? ''),
+    updated_at: String(row.updated_at ?? ''),
+    start_date: row.start_date != null ? String(row.start_date) : undefined,
+    end_date: row.end_date != null ? String(row.end_date) : undefined,
+    location: row.location != null ? String(row.location) : undefined,
+    questions: Array.isArray(row.questions)
+      ? (row.questions as Record<string, unknown>[]).map(toSurveyQuestion)
+      : undefined,
+  };
+}
+
+function toSurveyQuestion(row: Record<string, unknown>): SurveyQuestion {
+  return {
+    id: String(row.id),
+    survey_id: String(row.survey_id ?? ''),
+    text: String(row.text ?? ''),
+    type: (row.type as SurveyQuestion['type']) ?? 'nota',
+    options: Array.isArray(row.options) ? (row.options as string[]) : undefined,
+    required: row.required === 1 || row.required === true || row.required === '1',
+    display_order: Number(row.display_order ?? 0),
+    created_at: row.created_at != null ? String(row.created_at) : undefined,
   };
 }
 
@@ -539,5 +579,150 @@ export const api = {
 
   async getContactMessages(): Promise<ContactMessage[]> {
     return [];
+  },
+
+  // ============================================================
+  // Pesquisas de Satisfação
+  // ============================================================
+
+  async getSurveys(): Promise<SatisfactionSurvey[]> {
+    const res = await fetch(`${BASE}/surveys.php`);
+    const data = await parseJson<{ surveys?: Record<string, unknown>[] }>(res);
+    return (data.surveys ?? []).map(toSurvey);
+  },
+
+  async getSurveysByEvent(eventId: string): Promise<SatisfactionSurvey[]> {
+    const res = await fetch(`${BASE}/surveys.php?event_id=${encodeURIComponent(eventId)}`);
+    const data = await parseJson<{ surveys?: Record<string, unknown>[] }>(res);
+    return (data.surveys ?? []).map(toSurvey);
+  },
+
+  async getSurveyById(id: string): Promise<SatisfactionSurvey> {
+    const res = await fetch(`${BASE}/surveys.php?id=${encodeURIComponent(id)}`);
+    const data = await parseJson<{ survey?: Record<string, unknown>; error?: string }>(res);
+    if (!res.ok) throw new Error(data.error ?? 'Erro ao carregar pesquisa');
+    return toSurvey(data.survey ?? {});
+  },
+
+  async getSurveyBySlug(slug: string): Promise<SatisfactionSurvey> {
+    const res = await fetch(`${BASE}/surveys.php?slug=${encodeURIComponent(slug)}`);
+    const data = await parseJson<{ survey?: Record<string, unknown>; error?: string }>(res);
+    if (!res.ok) throw new Error(data.error ?? 'Pesquisa não encontrada');
+    return toSurvey(data.survey ?? {});
+  },
+
+  async createSurvey(
+    body: Omit<SatisfactionSurvey, 'id' | 'created_at' | 'updated_at' | 'event_name' | 'response_count'>
+  ): Promise<SatisfactionSurvey> {
+    const res = await fetch(`${BASE}/surveys.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await parseJson<{ survey?: Record<string, unknown>; error?: string }>(res);
+    if (!res.ok) throw new Error(data.error ?? 'Erro ao criar pesquisa');
+    return toSurvey(data.survey ?? {});
+  },
+
+  async updateSurvey(
+    id: string,
+    updates: Partial<Omit<SatisfactionSurvey, 'id' | 'created_at' | 'updated_at' | 'event_name' | 'response_count'>>
+  ): Promise<SatisfactionSurvey> {
+    const res = await fetch(`${BASE}/surveys.php?id=${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    const data = await parseJson<{ survey?: Record<string, unknown>; error?: string }>(res);
+    if (!res.ok) throw new Error(data.error ?? 'Erro ao atualizar pesquisa');
+    return toSurvey(data.survey ?? {});
+  },
+
+  async deleteSurvey(id: string): Promise<void> {
+    const res = await fetch(`${BASE}/surveys.php?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      const data = await parseJson<{ error?: string }>(res);
+      throw new Error(data.error ?? 'Erro ao excluir pesquisa');
+    }
+  },
+
+  async getSurveyQuestions(surveyId: string): Promise<SurveyQuestion[]> {
+    const res = await fetch(`${BASE}/survey_questions.php?survey_id=${encodeURIComponent(surveyId)}`);
+    const data = await parseJson<{ questions?: Record<string, unknown>[] }>(res);
+    return (data.questions ?? []).map(toSurveyQuestion);
+  },
+
+  async createSurveyQuestion(
+    surveyId: string,
+    body: Omit<SurveyQuestion, 'id' | 'survey_id' | 'created_at'>
+  ): Promise<SurveyQuestion> {
+    const res = await fetch(`${BASE}/survey_questions.php?survey_id=${encodeURIComponent(surveyId)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await parseJson<{ question?: Record<string, unknown>; error?: string }>(res);
+    if (!res.ok) throw new Error(data.error ?? 'Erro ao criar pergunta');
+    return toSurveyQuestion(data.question ?? {});
+  },
+
+  async updateSurveyQuestion(
+    surveyId: string,
+    id: string,
+    updates: Partial<Omit<SurveyQuestion, 'id' | 'survey_id' | 'created_at'>>
+  ): Promise<SurveyQuestion> {
+    const res = await fetch(
+      `${BASE}/survey_questions.php?survey_id=${encodeURIComponent(surveyId)}&id=${encodeURIComponent(id)}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      }
+    );
+    const data = await parseJson<{ question?: Record<string, unknown>; error?: string }>(res);
+    if (!res.ok) throw new Error(data.error ?? 'Erro ao atualizar pergunta');
+    return toSurveyQuestion(data.question ?? {});
+  },
+
+  async deleteSurveyQuestion(surveyId: string, id: string): Promise<void> {
+    const res = await fetch(
+      `${BASE}/survey_questions.php?survey_id=${encodeURIComponent(surveyId)}&id=${encodeURIComponent(id)}`,
+      { method: 'DELETE' }
+    );
+    if (!res.ok) {
+      const data = await parseJson<{ error?: string }>(res);
+      throw new Error(data.error ?? 'Erro ao excluir pergunta');
+    }
+  },
+
+  async submitSurveyResponse(surveyId: string, answers: SurveyAnswer[]): Promise<void> {
+    const res = await fetch(`${BASE}/survey_responses.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ survey_id: Number(surveyId), answers }),
+    });
+    if (!res.ok) {
+      const data = await parseJson<{ error?: string }>(res);
+      throw new Error(data.error ?? 'Erro ao enviar respostas');
+    }
+  },
+
+  async getSurveyResults(surveyId: string): Promise<SurveyResults> {
+    const res = await fetch(`${BASE}/survey_responses.php?survey_id=${encodeURIComponent(surveyId)}`);
+    const data = await parseJson<SurveyResults>(res);
+    if (!res.ok) throw new Error('Erro ao carregar resultados');
+    return data;
+  },
+
+  async clearSurveyResponses(surveyId: string): Promise<void> {
+    const res = await fetch(`${BASE}/survey_responses.php?survey_id=${encodeURIComponent(surveyId)}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      const data = await parseJson<{ error?: string }>(res);
+      throw new Error(data.error ?? 'Erro ao limpar respostas');
+    }
   },
 };

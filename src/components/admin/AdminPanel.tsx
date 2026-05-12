@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, BarChart3, LogOut, DollarSign, Users, Menu, X, ClipboardList, Package, Building2 } from 'lucide-react';
+import { Calendar, BarChart3, LogOut, DollarSign, Users, Menu, X, ClipboardList, Package, Building2, Star } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Dashboard from './Dashboard';
 import EventManagement from './EventManagement';
@@ -9,6 +9,7 @@ import GestaoEventos from './GestaoEventos';
 import EstoqueBar from './EstoqueBar';
 import UserManagement from './UserManagement';
 import SuppliersManagement from './SuppliersManagement';
+import SatisfactionSurveys from './SatisfactionSurveys';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -23,6 +24,7 @@ export default function AdminPanel() {
     { id: 'gestao-eventos', label: 'Gestão de Eventos', icon: <ClipboardList className="w-5 h-5" /> },
     { id: 'suppliers', label: 'Fornecedores', icon: <Building2 className="w-5 h-5" /> },
     { id: 'estoque-bar', label: 'Produtos & Vendas', icon: <Package className="w-5 h-5" /> },
+    { id: 'pesquisas', label: 'Pesquisas', icon: <Star className="w-5 h-5" /> },
   ];
 
   const tabs =
@@ -121,6 +123,7 @@ export default function AdminPanel() {
         {activeTab === 'gestao-eventos' && <GestaoEventos />}
         {activeTab === 'suppliers' && <SuppliersManagement />}
         {activeTab === 'estoque-bar' && <EstoqueBar />}
+        {activeTab === 'pesquisas' && <SatisfactionSurveys />}
         {activeTab === 'users' && profile?.role === 'root' && <UserManagement />}
       </main>
     </div>

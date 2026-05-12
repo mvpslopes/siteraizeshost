@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { copyFileSync } from 'fs';
+import { copyFileSync, cpSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
 // Plugin para copiar .htaccess após o build
@@ -21,9 +21,27 @@ const copyHtaccess = () => {
   };
 };
 
+// Plugin para copiar a pasta api/ inteira para dist/api/
+const copyApiFolder = () => {
+  return {
+    name: 'copy-api-folder',
+    closeBundle() {
+      try {
+        const src  = join(process.cwd(), 'api');
+        const dest = join(process.cwd(), 'dist', 'api');
+        mkdirSync(dest, { recursive: true });
+        cpSync(src, dest, { recursive: true });
+        console.log('✓ Pasta api/ copiada para dist/api/');
+      } catch (error) {
+        console.warn('⚠ Aviso: Não foi possível copiar a pasta api/:', error);
+      }
+    },
+  };
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), copyHtaccess()],
+  plugins: [react(), copyHtaccess(), copyApiFolder()],
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
@@ -41,5 +59,5 @@ export default defineConfig({
       },
     },
   },
-  base: './', // Importante para funcionar em subdiretórios se necessário
+  base: '/', // Mantém assets/config.js na raiz, inclusive em rotas públicas como /pesquisa/:slug
 });

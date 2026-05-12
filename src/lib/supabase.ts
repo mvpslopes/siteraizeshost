@@ -282,6 +282,67 @@ export interface EventBarItem {
   updated_at: string;
 }
 
+// ============================================================
+// Pesquisas de Satisfação
+// ============================================================
+
+export type SurveyStatus = 'rascunho' | 'publicada' | 'encerrada';
+export type SurveyQuestionType = 'nota' | 'texto' | 'multipla_escolha' | 'sim_nao' | 'nps';
+
+export interface SatisfactionSurvey {
+  id: string;
+  event_id: string;
+  event_name?: string;
+  title: string;
+  description?: string;
+  slug: string;
+  hero_image_url?: string;
+  status: SurveyStatus;
+  response_count?: number;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+  questions?: SurveyQuestion[];
+  /** campos do evento vindos do JOIN */
+  start_date?: string;
+  end_date?: string;
+  location?: string;
+}
+
+export interface SurveyQuestion {
+  id: string;
+  survey_id: string;
+  text: string;
+  type: SurveyQuestionType;
+  options?: string[];
+  required: boolean;
+  display_order: number;
+  created_at?: string;
+}
+
+export interface SurveyAnswer {
+  question_id: string;
+  answer: string;
+}
+
+// Resultado agregado por pergunta (vindo do endpoint de resultados)
+export interface SurveyQuestionStat {
+  question_id: number;
+  question_text: string;
+  type: SurveyQuestionType;
+  answer_count: number;
+  average?: number;
+  nps_score?: number;
+  distribution?: Record<string, number>;
+  text_answers?: string[];
+}
+
+export interface SurveyResults {
+  survey_id: number;
+  total_responses: number;
+  stats: SurveyQuestionStat[];
+}
+
 /** Lançamento de venda do bar (uma venda = um registro; dá baixa no estoque) */
 export interface EventBarSale {
   id: string;

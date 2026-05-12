@@ -14,10 +14,18 @@ import WhatsAppFloat from './components/WhatsAppFloat';
 import LoginPage from './components/LoginPage';
 import AdminPanel from './components/admin/AdminPanel';
 import SplashScreen from './components/SplashScreen';
+import SurveyPage from './components/public/SurveyPage';
+
+/** Verifica se a URL atual é uma pesquisa pública (/pesquisa/<slug>) */
+function getSurveySlugFromUrl(): string | null {
+  const match = window.location.pathname.match(/^\/pesquisa\/([^/]+)\/?$/);
+  return match ? match[1] : null;
+}
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<string>('home');
   const { user, loading, loggingIn, loggingOut } = useAuth();
+  const surveySlug = getSurveySlugFromUrl();
 
   useEffect(() => {
     if (user) {
@@ -43,6 +51,11 @@ function AppContent() {
       }, 100);
     }
   };
+
+  // Pesquisa pública — renderiza sem splash, sem auth
+  if (surveySlug) {
+    return <SurveyPage slug={surveySlug} />;
+  }
 
   if (loading) {
     return <SplashScreen subtitle="Carregando..." />;
